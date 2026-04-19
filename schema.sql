@@ -12,7 +12,7 @@ CREATE TABLE asset_types(
 CREATE TABLE family_members(
     member_id INT AUTO_INCREMENT,
     cnic VARCHAR(15) UNIQUE,
-    name VARCHAR(20),
+    name VARCHAR(100),
     date_of_birth DATETIME,
     gender CHAR(1),
     age INT AS (
@@ -91,7 +91,7 @@ CREATE TABLE wasiyat(
     
 CREATE TABLE assets(
 	asset_id INT AUTO_INCREMENT,
-    asset_name VARCHAR(30),
+    asset_name VARCHAR(100),
     type_id INT,
     owner_id INT,
     is_shareable BOOLEAN DEFAULT TRUE,
