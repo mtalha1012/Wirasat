@@ -26,11 +26,20 @@ CREATE TABLE family_members(
         PRIMARY KEY(member_id)
     );
     
+CREATE TABLE relation_types(
+	relation_id INT AUTO_INCREMENT,
+    relation_name VARCHAR(50) UNIQUE,
+    category VARCHAR(50),
+    
+    CONSTRAINT relation_types_pk
+		PRIMARY KEY(relation_id)
+	);
+    
 CREATE TABLE deceased_heirs(
 	mapping_id INT AUTO_INCREMENT,
     deceased_id INT,
     heir_id INT,
-    relation_type VARCHAR(30),
+    relation_id INT,
     
     CONSTRAINT deceased_heirs_pk
 		PRIMARY KEY(mapping_id),
@@ -40,6 +49,9 @@ CREATE TABLE deceased_heirs(
 	CONSTRAINT deceased_heirs_heir_fk
 		FOREIGN KEY(heir_id) REFERENCES
         family_members(member_id),
+	CONSTRAINT deceased_heirs_relation_fk
+		FOREIGN KEY(relation_id) REFERENCES
+        relation_types(relation_id),
 	CONSTRAINT deceased_heirs_unique
 		UNIQUE(deceased_id, heir_id),
 	CONSTRAINT deceased_not_heir_chk
@@ -71,10 +83,10 @@ CREATE TABLE wasiyat(
 		FOREIGN KEY(deceased_id) REFERENCES
         family_members(member_id),
 	CONSTRAINT wasiyat_beneficiary_fk
-		FOREIGN KEY(beneficiary_id) REF,
+		FOREIGN KEY(beneficiary_id) REFERENCES
+        family_members(member_id),
 	CONSTRAINT deceased_not_beneficiary_chk
-		CHECK (deceased_id != beneficiary_id)ERENCES
-        family_members(member_id)
+		CHECK (deceased_id != beneficiary_id)
     );
     
 CREATE TABLE assets(
@@ -82,9 +94,9 @@ CREATE TABLE assets(
     asset_name VARCHAR(30),
     type_id INT,
     owner_id INT,
-    is_shareable BetLEAN DEFAULT TRUE,
+    is_shareable BOOLEAN DEFAULT TRUE,
     
-    CONSTRAINT asstes_pk
+    CONSTRAINT assets_pk
 		PRIMARY KEY(asset_id),
 	CONSTRAINT assets_type_fk
 		FOREIGN KEY(type_id) REFERENCES
