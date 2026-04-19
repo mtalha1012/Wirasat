@@ -1,6 +1,5 @@
 ﻿USE wirasat;
 
--- View: Get Latest Asset Valuations
 CREATE OR REPLACE VIEW latest_valuations AS
 SELECT v.asset_id, v.amount, v.valuation_date
 FROM valuation_history v
@@ -14,39 +13,32 @@ DELIMITER //
 
 CREATE PROCEDURE GetEstateState(IN target_deceased_id INT)
 BEGIN
-    -- variables
     DECLARE total_assets DECIMAL(15,2) DEFAULT 0;
     DECLARE total_liabilities DECIMAL(15,2) DEFAULT 0;
     DECLARE total_wasiyat DECIMAL(15,2) DEFAULT 0;
     DECLARE max_wasiyat DECIMAL(15,2) DEFAULT 0;
     DECLARE net_estate DECIMAL(15,2) DEFAULT 0;
 
-    -- Calculate Total Assets
     SELECT COALESCE(SUM(lv.amount), 0) INTO total_assets
     FROM assets a
     JOIN latest_valuations lv ON a.asset_id = lv.asset_id
     WHERE a.owner_id = target_deceased_id;
 
-    -- Calculate Debts & Liabilities
     SELECT COALESCE(SUM(amount), 0) INTO total_liabilities
     FROM liabilities 
     WHERE deceased_id = target_deceased_id;
 
-    -- Calculate Wasiyat
     SELECT COALESCE(SUM(amount), 0) INTO total_wasiyat
     FROM wasiyat 
     WHERE deceased_id = target_deceased_id;
 
-    -- Enforce 1/3 Limit Rule
     SET max_wasiyat = (total_assets - total_liabilities) / 3;
     IF total_wasiyat > max_wasiyat THEN
         SET total_wasiyat = max_wasiyat;
     END IF;
 
-    -- Calculate Net Estate
     SET net_estate = total_assets - total_liabilities - total_wasiyat;
 
-    -- Output Final Financial State
     SELECT 
         total_assets AS Total_Assets,
         total_liabilities AS Total_Liabilities,
@@ -54,7 +46,6 @@ BEGIN
         max_wasiyat AS Max_Allowed_Wasiyat,
         net_estate AS Net_Distributable_Estate;
 
-    -- Output Alive Heirs List (Returns as a second result set)
     SELECT 
         dh.heir_id, 
         fm.name, 
