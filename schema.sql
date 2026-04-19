@@ -153,5 +153,21 @@ CREATE TABLE distribution_logs(
 		FOREIGN KEY(heir_id) REFERENCES
         family_members(member_id)
 	);
+
+CREATE TABLE faraid_blocking_rules (
+    rule_id INT AUTO_INCREMENT,
+    target_relation_id INT,
+    blocking_relation_id INT,
+    
+    CONSTRAINT faraid_blocking_rules_pk 
+        PRIMARY KEY(rule_id),
+    CONSTRAINT fk_target_relation 
+        FOREIGN KEY(target_relation_id) REFERENCES relation_types(relation_id),
+    CONSTRAINT fk_blocking_relation 
+        FOREIGN KEY(blocking_relation_id) REFERENCES relation_types(relation_id),
+    CONSTRAINT uiq_target_blocking 
+        UNIQUE(target_relation_id, blocking_relation_id)
+);
+
         
     
