@@ -12,18 +12,24 @@ CREATE TABLE asset_types(
 CREATE TABLE family_members(
     member_id INT AUTO_INCREMENT,
     cnic VARCHAR(15) UNIQUE,
-    name VARCHAR(100),
-    date_of_birth DATETIME,
-    gender CHAR(1),
-    age INT AS (
-        TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE())
-        ) VIRTUAL,
+    name VARCHAR(100) NOT NULL,
+    date_of_birth DATETIME NOT NULL,
+    gender CHAR(1) NOT NULL,
+    age INT,
     date_of_death DATETIME,
+    father_id INT,
+    mother_id INT,
 
     CONSTRAINT family_members_gender_chk
         CHECK (gender IN ('M', 'F')),
     CONSTRAINT family_members_pk
-        PRIMARY KEY(member_id)
+        PRIMARY KEY(member_id),
+	CONSTRAINT father_id_fk
+		FOREIGN KEY(father_id) REFERENCES
+        family_members(member_id),
+	CONSTRAINT mother_id_fk
+		FOREIGN KEY(mother_id) REFERENCES
+        family_members(member_id)
     );
     
 CREATE TABLE relation_types(
@@ -78,9 +84,10 @@ CREATE TABLE beneficiaries(
     member_id INT NULL,
     
     CONSTRAINT beneficiary_pk
-		PRIMARY KEY(beneficiary_id)
+		PRIMARY KEY(beneficiary_id),
 	CONSTRAINT beneficiary_member_id
-		FOREIGN KEY(
+		FOREIGN KEY(member_id) REFERENCES
+        family_members(member_id)
 	);
     
 CREATE TABLE wasiyat(
@@ -96,7 +103,7 @@ CREATE TABLE wasiyat(
         family_members(member_id),
 	CONSTRAINT wasiyat_beneficiary_fk
 		FOREIGN KEY(beneficiary_id) REFERENCES
-        family_members(member_id),
+        beneficiaries(beneficiary_id),
 	CONSTRAINT deceased_not_beneficiary_chk
 		CHECK (deceased_id != beneficiary_id)
     );
@@ -119,12 +126,13 @@ CREATE TABLE assets(
 	);
     
 CREATE TABLE valuation_history(
+	valuation_history_id INT AUTO_INCREMENT,
 	asset_id INT,
     valuation_date DATETIME,
     amount DECIMAL(12, 2),
     
     CONSTRAINT valuation_history_pk
-		PRIMARY KEY(asset_id, valuation_date),
+		PRIMARY KEY(valuation_id),
 	CONSTRAINT valuation_history_asset_fk
 		FOREIGN KEY(asset_id) REFERENCES
         assets(asset_id)
@@ -181,5 +189,3 @@ CREATE TABLE faraid_blocking_rules (
         UNIQUE(target_relation_id, blocking_relation_id)
 );
 
-        
-    
