@@ -15,10 +15,15 @@ CREATE TABLE family_members(
     name VARCHAR(100) NOT NULL,
     date_of_birth DATETIME NOT NULL,
     gender CHAR(1) NOT NULL,
-    age INT,
+    age INT AS (
+		TIMESTAMPDIFF(
+			YEAR, date_of_birth, 
+			IFNULL(date_of_death, CURDATE())
+			)
+		) VIRTUAL,
     date_of_death DATETIME,
-    father_id INT,
-    mother_id INT,
+    father_id INT NULL,
+    mother_id INT NULL,
 
     CONSTRAINT family_members_gender_chk
         CHECK (gender IN ('M', 'F')),
@@ -103,9 +108,7 @@ CREATE TABLE wasiyat(
         family_members(member_id),
 	CONSTRAINT wasiyat_beneficiary_fk
 		FOREIGN KEY(beneficiary_id) REFERENCES
-        beneficiaries(beneficiary_id),
-	CONSTRAINT deceased_not_beneficiary_chk
-		CHECK (deceased_id != beneficiary_id)
+        beneficiaries(beneficiary_id)
     );
     
 CREATE TABLE assets(
@@ -132,7 +135,7 @@ CREATE TABLE valuation_history(
     amount DECIMAL(12, 2),
     
     CONSTRAINT valuation_history_pk
-		PRIMARY KEY(valuation_id),
+		PRIMARY KEY(valuation_history_id),
 	CONSTRAINT valuation_history_asset_fk
 		FOREIGN KEY(asset_id) REFERENCES
         assets(asset_id)
@@ -146,6 +149,8 @@ CREATE TABLE asset_allocations(
     allocated_value DECIMAL(15, 2),
     is_finalized BOOLEAN DEFAULT FALSE,
     
+    CONSTRAINT percentage_chk
+		CHECK(allocated_percentege BETWEEN 0 and 100),
     CONSTRAINT asset_allocations_pk
 		PRIMARY KEY(allocation_id),
 	CONSTRAINT asset_allocations_asset_fk
@@ -156,13 +161,26 @@ CREATE TABLE asset_allocations(
         family_members(member_id)
 	);
     
+CREATE TABLE calculation_runs(
+	run_id INT AUTO_INCREMENT,
+    deceased_id INT NOT NULL,
+    run_date DATETIME NOT NULL DEFAULT NOW(),
+    net_estate DECIMAL(15, 2),
+    
+    CONSTRAINT calculation_runs_pk
+		PRIMARY KEY(run_id),
+	CONSTRAINT calculation_runs_deceased_fk
+		FOREIGN KEY(deceased_id) REFERENCES 
+        family_members(member_id)
+	);
+    
 CREATE TABLE distribution_logs(
 	log_id INT AUTO_INCREMENT,
-    share_fraction REAL,
+    share_fraction DECIMAL(10, 8),
     share_amount DECIMAL(12, 2),
-    run_date DATETIME,
     deceased_id INT,
     heir_id INT,
+    run_id INT,
     
     CONSTRAINT distribution_logs_pk
 		PRIMARY KEY(log_id),
@@ -171,7 +189,10 @@ CREATE TABLE distribution_logs(
         family_members(member_id),
 	CONSTRAINT distribution_logs_heir_fk
 		FOREIGN KEY(heir_id) REFERENCES
-        family_members(member_id)
+        family_members(member_id),
+	CONSTRAINT calculation_run_fk
+		FOREIGN KEY(run_id) REFERENCES
+        calculation_runs(run_id)
 	);
 
 CREATE TABLE faraid_blocking_rules (
@@ -181,7 +202,7 @@ CREATE TABLE faraid_blocking_rules (
     
     CONSTRAINT faraid_blocking_rules_pk 
         PRIMARY KEY(rule_id),
-    CONSTRAINT fk_target_relation 
+    CONSTRAINT target_relation_fk 
         FOREIGN KEY(target_relation_id) REFERENCES relation_types(relation_id),
     CONSTRAINT fk_blocking_relation 
         FOREIGN KEY(blocking_relation_id) REFERENCES relation_types(relation_id),
