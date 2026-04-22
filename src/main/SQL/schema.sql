@@ -114,8 +114,10 @@ CREATE TABLE IF NOT EXISTS beneficiaries(
 		FOREIGN KEY(beneficiary_type) REFERENCES
         beneficiary_types(type_id),
 	CONSTRAINT beneficiary_name_chk
-		CHECK(member_id IS NOT NULL OR 
-        beneficiary_name IS NOT NULL)
+		CHECK(
+			(member_id IS NOT NULL AND beneficiary_name IS NULL) OR
+            (member_id IS NULL     AND beneficiary_name IS NOT NULL)
+            )
 	);
     
 CREATE TABLE IF NOT EXISTS wasiyat(
