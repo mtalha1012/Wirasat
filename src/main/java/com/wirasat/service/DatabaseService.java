@@ -3,11 +3,10 @@ package com.wirasat.service;
 import com.wirasat.util.LoadProperties;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Properties;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 public class DatabaseService {
     // Attributes
@@ -23,29 +22,16 @@ public class DatabaseService {
 //    private static final Properties WASIYAT_QUERIES = LoadProperties.loadProperties(
 //            "wasiyat-queries.properties", classLoader);
 
-    private HikariDataSource dataSource;
+    private Connection connection;
     private static DatabaseService instance;
 
     // Constructor
     private DatabaseService() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(DB_PROPERTIES.getProperty("db.url"));
-        config.setUsername(DB_PROPERTIES.getProperty("db.user"));
-        config.setPassword(DB_PROPERTIES.getProperty("db.password"));
-        
-        // Optimizations for MySQL
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        
-        // Pool configurations
-        config.setMaximumPoolSize(10);
-        config.setMinimumIdle(2);
-        config.setIdleTimeout(30000);
-        config.setMaxLifetime(1800000); // 30 minutes
-        config.setConnectionTimeout(30000);
-
-        dataSource = new HikariDataSource(config);
+        try {
+            openConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to open database connection", e);
+        }
     }
 
     public static DatabaseService getInstance() {
@@ -53,14 +39,19 @@ public class DatabaseService {
                 instance = new DatabaseService());
     }
 
-    public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+    public Connection getConnection() {
+        return connection;
     }
 
-    public void closeConnection() {
-        if (dataSource != null && !dataSource.isClosed()) {
-            dataSource.close();
-        }
+    private void openConnection() throws SQLException {
+        connection = DriverManager.getConnection(
+                DB_PROPERTIES.getProperty("db.url"),
+                DB_PROPERTIES.getProperty("db.user"),
+                DB_PROPERTIES.getProperty("db.password"));
+    }
+
+    public void closeConnection() throws SQLException {
+        connection.close();
     }
 
     private String getQuery(Properties queries, String key) {
