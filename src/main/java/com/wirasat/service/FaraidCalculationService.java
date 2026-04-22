@@ -98,7 +98,7 @@ public class FaraidCalculationService {
             
         boolean hasMaleDescendant = eligibleHeirs.stream()
             .anyMatch(h -> h.relation.getCategory() != null && h.relation.getCategory().contains("Descendant") && 
-                           "M".equalsIgnoreCase(h.member.getGender()));
+                           String.valueOf(h.member.getGender()).equalsIgnoreCase("M"));
 
         long siblingCount = eligibleHeirs.stream()
             .filter(h -> h.relation.getCategory() != null && h.relation.getCategory().contains("Sibling")).count();
@@ -135,7 +135,7 @@ public class FaraidCalculationService {
     }
 
     private double calculateTotalAssetValue(List<Asset> assets) {
-        return assets.stream().mapToDouble(a -> a.getCurrentValue() != null ? a.getCurrentValue().doubleValue() : 0.0).sum();
+        return assets.stream().mapToDouble(a -> a.getValue() != null ? a.getValue().doubleValue() : 0.0).sum();
     }
 
     private double calculateTotalLiabilities(List<Liability> liabilities) {
@@ -195,13 +195,13 @@ public class FaraidCalculationService {
                 // Female Ta'seeb checks (e.g. Daughters become Asabah if Son exists)
                 // Dynamically check if a male of the EXACT same category is present
                 boolean maleCounterpartExists = heirs.stream().anyMatch(h -> 
-                    "M".equalsIgnoreCase(h.member.getGender()) && 
+                    String.valueOf(h.member.getGender()).equalsIgnoreCase("M") && 
                     h.relation.getCategory() != null &&
                     h.relation.getCategory().equals(relation.getCategory()) && 
                     h.relation.getRelationId() != relation.getRelationId() // Not themselves
                 );
 
-                if ("F".equalsIgnoreCase(group.get(0).member.getGender()) && maleCounterpartExists) {
+                if (String.valueOf(group.get(0).member.getGender()).equalsIgnoreCase("F") && maleCounterpartExists) {
                     group.forEach(h -> setupAsabah(h, getAsabahClass(relation.getCategory())));
                 } else {
                     double totalGroupShare = (double) appliedRule.getNumerator() / appliedRule.getDenominator();
@@ -273,13 +273,13 @@ public class FaraidCalculationService {
             if (isUterine) {
                 totalWeight += 1.0; // 1:1 sharing exception
             } else {
-                totalWeight += "M".equalsIgnoreCase(a.member.getGender()) ? 2.0 : 1.0; // 2:1 mapping
+                totalWeight += String.valueOf(a.member.getGender()).equalsIgnoreCase("M") ? 2.0 : 1.0; // 2:1 mapping
             }
         }
 
         for (HeirCandidate a : activeAsabah) {
             double weight = 1.0;
-            if (!isUterine && "M".equalsIgnoreCase(a.member.getGender())) weight = 2.0;
+            if (!isUterine && String.valueOf(a.member.getGender()).equalsIgnoreCase("M")) weight = 2.0;
             a.fractionAssigned += remainder * (weight / totalWeight); 
         }
         return true;
