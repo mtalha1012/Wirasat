@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4de96bbd-a37e-45cc-8b27-c272a6139759" name="Changes" comment="Merge branch 'master' of https://github.com/mtalha1012/Wirasat&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml">
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="4de96bbd-a37e-45cc-8b27-c272a6139759" name="Changes" comment="Classes of tables created">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/wirasat/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/wirasat/HelloApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/wirasat/service/DatabaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/wirasat/service/DatabaseService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/wirasat/HelloApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/wirasat/Launcher.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +46,9 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.HelloApplication.executor": "Run",
+    "Application.Launcher.executor": "Run",
+    "Application.Main.executor": "Run",
+    "Maven.Wirasat [clean].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -107,7 +107,23 @@
       <option name="project" value="LOCAL" />
       <updated>1776584749209</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Database connection working properly">
+      <option name="closed" value="true" />
+      <created>1776846585157</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1776846585157</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Classes of tables created">
+      <option name="closed" value="true" />
+      <created>1776849439393</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1776849439393</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -118,6 +134,8 @@
     <MESSAGE value="Initial schema ready" />
     <MESSAGE value="go" />
     <MESSAGE value="init db" />
-    <option name="LAST_COMMIT_MESSAGE" value="init db" />
+    <MESSAGE value="Database connection working properly" />
+    <MESSAGE value="Classes of tables created" />
+    <option name="LAST_COMMIT_MESSAGE" value="Classes of tables created" />
   </component>
 </project>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane stylesheets="@styles.css" styleClass="main-background" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.AssetsController">
+
+    <left>
+        <VBox styleClass="sidebar" prefWidth="250" spacing="15">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <VBox spacing="2">
+                <Label text="Wirasat" styleClass="logo-text"/>
+                <Label text="INHERITANCE MANAGER" styleClass="logo-subtext"/>
+            </VBox>
+            <Region prefHeight="30" /> 
+            
+            <Button text="Dashboard" styleClass="nav-button"/>
+            <Button text="Family Members" styleClass="nav-button"/>
+            <Button text="Assets" styleClass="nav-button, active-nav"/>
+            <Button text="Liabilities" styleClass="nav-button"/>
+            <Button text="Wasiyat (Will)" styleClass="nav-button"/>
+            <Button text="Distribution" styleClass="nav-button"/>
+            <Button text="Heirs &amp; Relations" styleClass="nav-button"/>
+            
+            <Region VBox.vgrow="ALWAYS" /> 
+            <VBox styleClass="quote-box">
+                <Label text="لِلرِّجَالِ نَصِيبٌ مِّمَّا تَرَكَ الْوَالِدَانِ" styleClass="arabic-text"/>
+                <Label text="- An-Nisa 4:7" styleClass="quote-text"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="20" right="40" bottom="20" left="40"/>
+            </padding>
+            
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <TextField promptText="Search members, assets..." styleClass="search-bar" HBox.hgrow="ALWAYS"/>
+                <Label text="Tuesday, April 21, 2026" styleClass="date-text"/>
+            </HBox>
+
+            <VBox spacing="5">
+                <Label text="Assets" styleClass="page-title"/>
+                <Label text="Track all assets with valuations and ownership" styleClass="page-subtitle"/>
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Button text="+ Add Asset" styleClass="action-button"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <ComboBox promptText="All Categories" styleClass="category-combo"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true" styleClass="edge-to-edge" VBox.vgrow="ALWAYS">
+                <FlowPane fx:id="cardsContainer" hgap="20" vgap="20" />
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
