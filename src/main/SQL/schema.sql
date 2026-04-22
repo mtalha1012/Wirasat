@@ -146,7 +146,6 @@ CREATE TABLE IF NOT EXISTS asset_allocations(
     asset_id INT,
     heir_id INT,
     allocated_percentage DECIMAL(5, 2),
-    allocated_value DECIMAL(15, 2),
     is_finalized BOOLEAN DEFAULT FALSE,
     
     CONSTRAINT percentage_chk
