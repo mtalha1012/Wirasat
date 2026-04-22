@@ -82,17 +82,28 @@ CREATE TABLE IF NOT EXISTS liabilities(
         family_members(member_id)
 	);
     
+CREATE TABLE IF NOT EXISTS beneficiary_types (
+    type_id   INT AUTO_INCREMENT,
+    type_name VARCHAR(30) UNIQUE NOT NULL,
+
+    CONSTRAINT beneficiary_types_pk
+        PRIMARY KEY (type_id)
+);
+    
 CREATE TABLE IF NOT EXISTS beneficiaries(
 	beneficiary_id INT AUTO_INCREMENT,
     beneficiary_name VARCHAR(100),
-	beneficiary_type VARCHAR(30),
+	beneficiary_type INT,
     member_id INT NULL,
     
     CONSTRAINT beneficiary_pk
 		PRIMARY KEY(beneficiary_id),
 	CONSTRAINT beneficiary_member_id
 		FOREIGN KEY(member_id) REFERENCES
-        family_members(member_id)
+        family_members(member_id),
+	CONSTRAINT beneficiary_type_fk
+		FOREIGN KEY(beneficiary_type) REFERENCES
+        beneficiary_types(type_id)
 	);
     
 CREATE TABLE IF NOT EXISTS wasiyat(
