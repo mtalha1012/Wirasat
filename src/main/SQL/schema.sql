@@ -178,15 +178,11 @@ CREATE TABLE distribution_logs(
 	log_id INT AUTO_INCREMENT,
     share_fraction DECIMAL(10, 8),
     share_amount DECIMAL(12, 2),
-    deceased_id INT,
     heir_id INT,
     run_id INT,
     
     CONSTRAINT distribution_logs_pk
 		PRIMARY KEY(log_id),
-	CONSTRAINT distribution_logs_deceased_fk
-		FOREIGN KEY(deceased_id) REFERENCES
-        family_members(member_id),
 	CONSTRAINT distribution_logs_heir_fk
 		FOREIGN KEY(heir_id) REFERENCES
         family_members(member_id),
