@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="4de96bbd-a37e-45cc-8b27-c272a6139759" name="Changes" comment="Initial schema ready">
-      <change afterPath="$PROJECT_DIR$/seed.sql" afterDir="false" />
+    <list default="true" id="4de96bbd-a37e-45cc-8b27-c272a6139759" name="Changes" comment="Merge branch 'master' of https://github.com/mtalha1012/Wirasat&#10;&#10;# Conflicts:&#10;#&#9;.idea/misc.xml">
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/queries.sql" beforeDir="false" afterPath="$PROJECT_DIR$/queries.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/schema.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/wirasat/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/wirasat/HelloApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/wirasat/service/DatabaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/wirasat/service/DatabaseService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,9 +30,13 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/mtalha1012/Wirasat&quot;,
-    &quot;accountId&quot;: &quot;815933a4-26ae-4bd3-8a11-049cef72cea2&quot;
+    &quot;accountId&quot;: &quot;671b0c28-0ca2-4180-a155-4a164bd1f188&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6,
   &quot;fromUser&quot;: false
@@ -39,19 +48,22 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.HelloApplication.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "Merging master"
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true"
   }
 }]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-b63d5a1f7c97-b61e75351b1f-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.22158.340" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
       </set>
     </attachedChunks>
   </component>

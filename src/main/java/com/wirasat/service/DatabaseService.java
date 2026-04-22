@@ -13,14 +13,14 @@ public class DatabaseService {
     private static final ClassLoader classLoader = DatabaseService.class.getClassLoader();
     private static final Properties DB_PROPERTIES = LoadProperties.loadProperties(
             "db.properties", classLoader);
-    private static final Properties FAMILY_QUERIES = LoadProperties.loadProperties(
-            "family-queries.properties", classLoader);
-    private static final Properties ASSET_QUERIES = LoadProperties.loadProperties(
-            "asset-queries.properties", classLoader);
-    private static final Properties LIABILITY_QUERIES = LoadProperties.loadProperties(
-            "liability-queries.properties", classLoader);
-    private static final Properties WASIYAT_QUERIES = LoadProperties.loadProperties(
-            "wasiyat-queries.properties", classLoader);
+//    private static final Properties FAMILY_QUERIES = LoadProperties.loadProperties(
+//            "family-queries.properties", classLoader);
+//    private static final Properties ASSET_QUERIES = LoadProperties.loadProperties(
+//            "asset-queries.properties", classLoader);
+//    private static final Properties LIABILITY_QUERIES = LoadProperties.loadProperties(
+//            "liability-queries.properties", classLoader);
+//    private static final Properties WASIYAT_QUERIES = LoadProperties.loadProperties(
+//            "wasiyat-queries.properties", classLoader);
 
     private Connection connection;
     private static DatabaseService instance;
@@ -60,19 +60,19 @@ public class DatabaseService {
         return query;
     }
 
-    public String getFamilyQuery(String key) {
-        return getQuery(FAMILY_QUERIES, key);
-    }
-
-    public String getAssetQuery(String key) {
-        return getQuery(ASSET_QUERIES, key);
-    }
-
-    public String getLiabilityQuery(String key) {
-        return getQuery(LIABILITY_QUERIES, key);
-    }
-
-    public String getWasiyatQuery(String key) {
-        return getQuery(WASIYAT_QUERIES, key);
-    }
+//    public String getFamilyQuery(String key) {
+//        return getQuery(FAMILY_QUERIES, key);
+//    }
+//
+//    public String getAssetQuery(String key) {
+//        return getQuery(ASSET_QUERIES, key);
+//    }
+//
+//    public String getLiabilityQuery(String key) {
+//        return getQuery(LIABILITY_QUERIES, key);
+//    }
+//
+//    public String getWasiyatQuery(String key) {
+//        return getQuery(WASIYAT_QUERIES, key);
+//    }
 }
