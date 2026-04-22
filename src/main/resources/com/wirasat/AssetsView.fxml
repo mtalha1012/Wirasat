@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.AssetsController">
+    <padding>
+        <Insets top="20" right="40" bottom="20" left="40"/>
+    </padding>
+    
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <TextField fx:id="searchField" promptText="Search members, assets..." styleClass="search-bar" HBox.hgrow="ALWAYS"/>
+        <Label text="Tuesday, April 21, 2026" styleClass="date-text"/>
+    </HBox>
+
+    <VBox spacing="5">
+        <Label text="Assets" styleClass="page-title"/>
+        <Label text="Track all assets with valuations and ownership" styleClass="page-subtitle"/>
+    </VBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Button text="+ Add Asset" styleClass="action-button" onAction="#handleAddAsset"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="categoryCombo" promptText="All Categories" styleClass="category-combo"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" styleClass="edge-to-edge" VBox.vgrow="ALWAYS">
+        <FlowPane fx:id="cardsContainer" hgap="20" vgap="20" />
+    </ScrollPane>
+</VBox>

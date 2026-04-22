@@ -130,6 +130,7 @@ public class FaraidCalculationService {
         }
 
         List<AssetAllocation> allocations = processMonetaryAllocations(eligibleHeirs, netEstate);
+        run.setAllocations(allocations);
         
         return run;
     }

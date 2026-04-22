@@ -51,6 +51,16 @@ public class CalculationRun {
         this.netEstate = netEstate;
     }
 
+    private java.util.List<AssetAllocation> allocations = new java.util.ArrayList<>();
+
+    public java.util.List<AssetAllocation> getAllocations() {
+        return allocations;
+    }
+
+    public void setAllocations(java.util.List<AssetAllocation> allocations) {
+        this.allocations = allocations;
+    }
+
     @Override
     public String toString() {
         return "CalculationRun{" +

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" style="-fx-background-color: #0b101a;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.DistributionController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Sharia Asset Allocator" styleClass="page-title"/>
+            <Label text="Dynamically assign properties to heirs to fulfill their Faraid quotas" styleClass="page-subtitle"/>
+        </VBox>
+        <Button text="1. Calculate Shares" styleClass="action-button" onAction="#handleRunCalculation"/>
+        <Button text="2. Auto-Assign" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;" onAction="#handleAutoAssign"/>
+    </HBox>
+    
+    <Label fx:id="resultSummary" style="-fx-font-size: 14px; -fx-text-fill: #9ca3af;" wrapText="true"/>
+
+    <SplitPane dividerPositions="0.4" VBox.vgrow="ALWAYS">
+        <VBox spacing="10" styleClass="dark-panel">
+            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+            <Label text="Heir Fulfillment" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #E2B93B;"/>
+            <ScrollPane fitToWidth="true" styleClass="edge-to-edge" VBox.vgrow="ALWAYS">
+                <VBox fx:id="heirBucketsContainer" spacing="12"/>
+            </ScrollPane>
+        </VBox>
+        
+        <VBox spacing="10" styleClass="dark-panel">
+            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+            <Label text="Asset Portfolios (Remap)" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #E2B93B;"/>
+            <ScrollPane fitToWidth="true" styleClass="edge-to-edge" VBox.vgrow="ALWAYS">
+                <VBox fx:id="assetCardsContainer" spacing="12"/>
+            </ScrollPane>
+        </VBox>
+    </SplitPane>
+</VBox>

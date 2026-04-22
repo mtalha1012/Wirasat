@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" style="-fx-background-color: #0b101a;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.WasiyatController">
+    <padding>
+        <Insets top="20" right="40" bottom="20" left="40"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Wasiyat (The Will)" styleClass="page-title"/>
+            <Label text="Record charitable bequeathals or gifts for non-heirs" styleClass="page-subtitle"/>
+        </VBox>
+        <Button text="+ Add Wasiyat" styleClass="action-button" onAction="#handleAddWasiyat"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" styleClass="edge-to-edge" VBox.vgrow="ALWAYS">
+        <FlowPane fx:id="cardsContainer" hgap="20" vgap="20" />
+    </ScrollPane>
+</VBox>

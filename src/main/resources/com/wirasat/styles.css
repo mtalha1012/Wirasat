@@ -117,3 +117,95 @@
    -fx-background-color: transparent;
    -fx-border-color: transparent;
 }
+.card-action-btn {
+    -fx-background-color: rgba(226, 185, 59, 0.15);
+    -fx-text-fill: #E2B93B;
+    -fx-font-size: 11px;
+    -fx-padding: 4 12;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+.card-action-btn:hover {
+    -fx-background-color: rgba(226, 185, 59, 0.3);
+}
+.card-delete-btn {
+    -fx-background-color: rgba(239, 68, 68, 0.15);
+    -fx-text-fill: #ef4444;
+    -fx-font-size: 11px;
+    -fx-padding: 4 12;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+.card-delete-btn:hover {
+    -fx-background-color: rgba(239, 68, 68, 0.3);
+}
+.dark-panel {
+    -fx-background-color: #151c28;
+    -fx-background-radius: 8;
+    -fx-border-color: #1f2937;
+    -fx-border-radius: 8;
+}
+.dark-label {
+    -fx-text-fill: #d1d5db;
+}
+.dark-label-bold {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+.split-pane, .split-pane > .split-pane-divider {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+.tree-view {
+    -fx-background-color: #1c2331;
+    -fx-border-color: #374151;
+}
+.tree-view .tree-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d1d5db;
+}
+.tree-view .tree-cell .label {
+    -fx-text-fill: #d1d5db;
+}
+.tree-view .tree-cell:selected {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #E2B93B;
+}
+.tree-view .tree-cell:selected .label {
+    -fx-text-fill: #E2B93B;
+}
+.tree-view .tree-cell:empty {
+    -fx-background-color: transparent;
+}
+.combo-box .list-cell, .combo-box-popup .list-cell {
+    -fx-text-fill: #d1d5db;
+    -fx-background-color: #1c2331;
+}
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #E2B93B;
+}
+.table-view {
+    -fx-background-color: #1c2331;
+    -fx-border-color: #1f2937;
+}
+.table-view .column-header-background {
+    -fx-background-color: #151c28;
+}
+.table-view .column-header .label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-weight: bold;
+}
+.table-view .table-row-cell {
+    -fx-background-color: #1c2331;
+    -fx-text-fill: #d1d5db;
+}
+.table-view .table-row-cell:selected {
+    -fx-background-color: #1f2937;
+}
+.progress-bar > .track {
+    -fx-background-color: #1f2937;
+}
+.progress-bar > .bar {
+    -fx-background-color: #3b82f6;
+}

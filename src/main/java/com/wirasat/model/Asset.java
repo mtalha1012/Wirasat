@@ -51,7 +51,13 @@ public class Asset {
         this.ownerId = ownerId;
     }
 
-    public java.math.BigDecimal getValue() { return java.math.BigDecimal.ZERO; }
+    public java.math.BigDecimal getValue() { 
+        return value; 
+    }
+    
+    public void setValue(java.math.BigDecimal value) {
+        this.value = value;
+    }
     public boolean isShareable() {
         return isShareable;
     }

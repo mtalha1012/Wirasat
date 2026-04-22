@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" style="-fx-background-color: #0b101a;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.FamilyMembersController">
+    <padding>
+        <Insets top="20" right="40" bottom="20" left="40"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Family Tree &amp; Members" styleClass="page-title"/>
+            <Label text="Build the genealogy tree — add relatives and mark life status" styleClass="page-subtitle"/>
+        </VBox>
+        <Button text="+ Add Relative" styleClass="action-button" onAction="#handleAddRelative"/>
+    </HBox>
+    
+    <SplitPane dividerPositions="0.55" VBox.vgrow="ALWAYS">
+        <!-- Left: Tree -->
+        <VBox spacing="10" styleClass="dark-panel">
+            <padding><Insets top="15" right="15" bottom="15" left="15"/></padding>
+            <Label text="Family Hierarchy" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #E2B93B;"/>
+            <TreeView fx:id="familyTree" VBox.vgrow="ALWAYS"/>
+        </VBox>
+        
+        <!-- Right: Action Panel -->
+        <VBox spacing="15" styleClass="dark-panel">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <Label text="Member Actions" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            
+            <VBox fx:id="actionPanel" spacing="12" visible="false">
+                <Label fx:id="selectedNodeLabel" style="-fx-font-size: 16px; -fx-text-fill: #E2B93B; -fx-font-weight: bold;" text="" wrapText="true"/>
+                <Label fx:id="statusLabel" text="" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                <Label fx:id="relationLabel" text="" style="-fx-text-fill: #9ca3af;" wrapText="true"/>
+                <Separator style="-fx-background-color: #374151;"/>
+                
+                <Label text="Quick Add:" style="-fx-font-weight: bold; -fx-text-fill: #d1d5db;"/>
+                <HBox spacing="8">
+                    <Button text="+ Son" onAction="#handleAddSon" style="-fx-background-color: rgba(59,130,246,0.2); -fx-text-fill: #60a5fa; -fx-font-size: 12px; -fx-cursor: hand;"/>
+                    <Button text="+ Daughter" onAction="#handleAddDaughter" style="-fx-background-color: rgba(244,114,182,0.2); -fx-text-fill: #f472b6; -fx-font-size: 12px; -fx-cursor: hand;"/>
+                    <Button text="+ Wife" onAction="#handleAddWife" style="-fx-background-color: rgba(226,185,59,0.2); -fx-text-fill: #E2B93B; -fx-font-size: 12px; -fx-cursor: hand;"/>
+                </HBox>
+                <HBox spacing="8">
+                    <Button text="+ Brother" onAction="#handleAddBrother" style="-fx-background-color: rgba(52,211,153,0.2); -fx-text-fill: #34d399; -fx-font-size: 12px; -fx-cursor: hand;"/>
+                    <Button text="+ Sister" onAction="#handleAddSister" style="-fx-background-color: rgba(167,139,250,0.2); -fx-text-fill: #a78bfa; -fx-font-size: 12px; -fx-cursor: hand;"/>
+                </HBox>
+                <HBox spacing="8">
+                    <Button text="+ Father" onAction="#handleAddFather" style="-fx-background-color: rgba(96,165,250,0.2); -fx-text-fill: #60a5fa; -fx-font-size: 12px; -fx-cursor: hand;"/>
+                    <Button text="+ Mother" onAction="#handleAddMother" style="-fx-background-color: rgba(244,114,182,0.2); -fx-text-fill: #f472b6; -fx-font-size: 12px; -fx-cursor: hand;"/>
+                </HBox>
+                
+                <Separator style="-fx-background-color: #374151;"/>
+                <Button fx:id="toggleDeathBtn" text="Mark as Deceased" maxWidth="Infinity" style="-fx-background-color: rgba(239,68,68,0.2); -fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-cursor: hand;" onAction="#handleToggleDeath"/>
+                <Button text="Remove from Tree" maxWidth="Infinity" style="-fx-background-color: rgba(239,68,68,0.1); -fx-text-fill: #fca5a5; -fx-cursor: hand;" onAction="#handleRemoveNode"/>
+            </VBox>
+            
+            <Label fx:id="instructionLabel" text="Click a member in the tree to see actions" style="-fx-text-fill: #6b7280; -fx-font-size: 14px;" wrapText="true"/>
+        </VBox>
+    </SplitPane>
+</VBox>

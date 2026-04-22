@@ -4,13 +4,13 @@
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.wirasat.CardController" 
-      styleClass="asset-card" prefWidth="300" prefHeight="160" spacing="0">
+      styleClass="asset-card" prefWidth="300" prefHeight="180" spacing="0">
     
     <Pane fx:id="topColorBand" prefHeight="5" style="-fx-background-color: #E2B93B;"/>
     
-    <VBox style="-fx-padding: 15;" spacing="10" VBox.vgrow="ALWAYS">
+    <VBox style="-fx-padding: 15;" spacing="8" VBox.vgrow="ALWAYS">
         <HBox alignment="TOP_LEFT" spacing="10">
-            <Label fx:id="titleLabel" text="Asset Title" styleClass="card-title" wrapText="true" HBox.hgrow="ALWAYS" prefWidth="180"/>
+            <Label fx:id="titleLabel" text="Title" styleClass="card-title" wrapText="true" HBox.hgrow="ALWAYS" prefWidth="180"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="categoryLabel" text="Category" styleClass="tag-category"/>
         </HBox>
@@ -21,9 +21,14 @@
         
         <HBox alignment="CENTER_LEFT" spacing="5">
             <Label text="Owner:" styleClass="card-owner-label"/>
-            <Label fx:id="ownerLabel" text="Owner Name" styleClass="card-owner-name"/>
+            <Label fx:id="ownerLabel" text="" styleClass="card-owner-name"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="statusLabel" text="SHAREABLE" styleClass="tag-status"/>
+        </HBox>
+        
+        <HBox alignment="CENTER_RIGHT" spacing="8">
+            <Button fx:id="editBtn" text="Edit" styleClass="card-action-btn"/>
+            <Button fx:id="deleteBtn" text="Delete" styleClass="card-delete-btn"/>
         </HBox>
     </VBox>
 </VBox>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.AddAssetDialogController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="Add New Asset" styleClass="page-title"/>
+
+    <GridPane hgap="10" vgap="10">
+        <Label text="Asset Name:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <TextField fx:id="nameField" promptText="Enter asset name" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS"/>
+
+        <Label text="Category:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <ComboBox fx:id="categoryCombo" promptText="Select a Category" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.hgrow="ALWAYS" maxWidth="Infinity"/>
+
+        <Label text="Estimated Value (Rs):" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <TextField fx:id="valueField" promptText="E.g. 5000000" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.hgrow="ALWAYS"/>
+
+        <Label text="Owner:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <ComboBox fx:id="ownerCombo" promptText="Select Owner" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.hgrow="ALWAYS" maxWidth="Infinity"/>
+
+        <Label text="Is Shareable?" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <CheckBox fx:id="shareableCheck" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+    </GridPane>
+
+    <Region VBox.vgrow="ALWAYS"/>
+    <Label fx:id="errorLabel" textFill="red" visible="false"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel" onAction="#handleCancel" styleClass="nav-button"/>
+        <Button text="Save Asset" onAction="#handleSave" styleClass="action-button"/>
+    </HBox>
+
+</VBox>

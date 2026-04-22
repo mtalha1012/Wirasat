@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" style="-fx-background-color: #0b101a;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.HeirsRelationsController">
+    <padding>
+        <Insets top="20" right="40" bottom="20" left="40"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Heirs &amp; Relations" styleClass="page-title"/>
+            <Label text="Map the inheritance tree from the deceased to their surviving relatives" styleClass="page-subtitle"/>
+        </VBox>
+        <Button text="+ Map New Relation" styleClass="action-button" onAction="#handleAddMapping"/>
+    </HBox>
+
+    <TableView fx:id="relationsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colDeceased" text="Principal (Deceased)" prefWidth="150" />
+            <TableColumn fx:id="colHeir" text="Surviving Heir" prefWidth="250" />
+            <TableColumn fx:id="colRelation" text="Relationship Status" prefWidth="180" />
+            <TableColumn fx:id="colCategory" text="Relation Group" prefWidth="150" />
+        </columns>
+    </TableView>
+</VBox>
