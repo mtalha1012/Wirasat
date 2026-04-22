@@ -216,16 +216,31 @@ CREATE TABLE IF NOT EXISTS faraid_blocking_rules (
         UNIQUE(target_relation_id, blocking_relation_id)
 );
 
+CREATE TABLE condition_types (
+    condition_id   INT AUTO_INCREMENT,
+    condition_name VARCHAR(50) NOT NULL,
+    description    VARCHAR(255),
+
+    CONSTRAINT condition_types_pk
+        PRIMARY KEY (condition_id),
+    CONSTRAINT condition_types_name_uq
+        UNIQUE (condition_name)
+);
+
 CREATE TABLE IF NOT EXISTS share_rules (
     rule_id INT AUTO_INCREMENT,
     relation_id INT NOT NULL,
     numerator INT NOT NULL,
     denominator INT NOT NULL,
-    condition_type VARCHAR(50) DEFAULT 'DEFAULT',
+    condition_type INT,
     
     CONSTRAINT share_rules_pk 
         PRIMARY KEY(rule_id),
     CONSTRAINT share_rules_relation_fk 
-        FOREIGN KEY(relation_id) REFERENCES relation_types(relation_id)
+        FOREIGN KEY(relation_id) REFERENCES 
+        relation_types(relation_id),
+	CONSTRAINT condition_rules_fk
+		FOREIGN KEY(condition_id) REFERENCES
+        condition_types(condition_id)
 );
 
