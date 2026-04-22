@@ -145,7 +145,6 @@ CREATE TABLE asset_allocations(
 	allocation_id INT AUTO_INCREMENT,
     asset_id INT,
     heir_id INT,
-    run_id INT,
     allocated_percentage DECIMAL(5, 2),
     allocated_value DECIMAL(15, 2),
     is_finalized BOOLEAN DEFAULT FALSE,
@@ -159,10 +158,7 @@ CREATE TABLE asset_allocations(
         assets(asset_id),
 	CONSTRAINT asset_allocations_heir_fk
 		FOREIGN KEY(heir_id) REFERENCES
-        family_members(member_id),
-	CONSTRAINT asset_allocations_run_fk
-		FOREIGN KEY(run_id) REFERENCES
-        calculation_runs(run_id)
+        family_members(member_id)
 	);
     
 CREATE TABLE calculation_runs(
@@ -212,5 +208,18 @@ CREATE TABLE faraid_blocking_rules (
         FOREIGN KEY(blocking_relation_id) REFERENCES relation_types(relation_id),
     CONSTRAINT uiq_target_blocking 
         UNIQUE(target_relation_id, blocking_relation_id)
+);
+
+CREATE TABLE share_rules (
+    rule_id INT AUTO_INCREMENT,
+    relation_id INT NOT NULL,
+    numerator INT NOT NULL,
+    denominator INT NOT NULL,
+    condition_type VARCHAR(50) DEFAULT 'DEFAULT',
+    
+    CONSTRAINT share_rules_pk 
+        PRIMARY KEY(rule_id),
+    CONSTRAINT share_rules_relation_fk 
+        FOREIGN KEY(relation_id) REFERENCES relation_types(relation_id)
 );
 

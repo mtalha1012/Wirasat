@@ -83,3 +83,24 @@ INSERT INTO faraid_blocking_rules (target_relation_id, blocking_relation_id) VAL
 (19, 3),  -- Uncle blocked by Father
 (20, 19); -- Cousin blocked by Uncle
 
+-- SHARE RULES (Faraid Fractional Shares)
+INSERT INTO share_rules (relation_id, numerator, denominator, condition_type) VALUES
+-- Husband
+(1, 1, 2, 'NO_CHILD'),        -- 1/2
+(1, 1, 4, 'WITH_CHILD'),      -- 1/4
+
+-- Wife
+(2, 1, 4, 'NO_CHILD'),        -- 1/4
+(2, 1, 8, 'WITH_CHILD'),      -- 1/8
+
+-- Father
+(3, 1, 6, 'WITH_CHILD'),      -- 1/6 if there are children. If no children, he is residuary.
+
+-- Mother
+(4, 1, 6, 'WITH_CHILD_OR_SIBLING'), -- 1/6
+(4, 1, 3, 'NO_CHILD'),              -- 1/3
+
+-- Daughter (when there is NO son, otherwise Asabah)
+(6, 1, 2, 'ONLY_ONE'),        -- 1/2 if 1 daughter
+(6, 2, 3, 'MULTIPLE');        -- 2/3 if 2+ daughters
+
