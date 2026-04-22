@@ -37,13 +37,22 @@ CREATE TABLE IF NOT EXISTS family_members(
         family_members(member_id)
     );
     
+CREATE TABLE IF NOT EXISTS relation_categories(
+	category_id   INT AUTO_INCREMENT,
+    category_name VARCHAR(50) UNIQUE NOT NULL,
+    CONSTRAINT relation_categories_pk PRIMARY KEY (category_id)
+	);
+    
 CREATE TABLE IF NOT EXISTS relation_types(
 	relation_id INT AUTO_INCREMENT,
     relation_name VARCHAR(50) UNIQUE,
-    category VARCHAR(50),
+    category_id INT,
     
     CONSTRAINT relation_types_pk
-		PRIMARY KEY(relation_id)
+		PRIMARY KEY(relation_id),
+	CONSTRAINT relation_types_category_fk
+		FOREIGN KEY (category_id) REFERENCES 
+		relation_categories(category_id)
 	);
     
 CREATE TABLE IF NOT EXISTS deceased_heirs(
@@ -103,7 +112,10 @@ CREATE TABLE IF NOT EXISTS beneficiaries(
         family_members(member_id),
 	CONSTRAINT beneficiary_type_fk
 		FOREIGN KEY(beneficiary_type) REFERENCES
-        beneficiary_types(type_id)
+        beneficiary_types(type_id),
+	CONSTRAINT beneficiary_name_chk
+		CHECK(member_id IS NOT NULL OR 
+        beneficiary_name IS NOT NULL)
 	);
     
 CREATE TABLE IF NOT EXISTS wasiyat(
@@ -240,7 +252,7 @@ CREATE TABLE IF NOT EXISTS share_rules (
         FOREIGN KEY(relation_id) REFERENCES 
         relation_types(relation_id),
 	CONSTRAINT condition_rules_fk
-		FOREIGN KEY(condition_id) REFERENCES
+		FOREIGN KEY(condition_type) REFERENCES
         condition_types(condition_id)
 );
 
