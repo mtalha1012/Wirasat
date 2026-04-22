@@ -21,21 +21,38 @@ import com.wirasat.model.Wasiyat;
 
 public class FaraidCalculationService {
 
+    // Database mapped Relation IDs from seed.sql
+    private static final int REL_HUSBAND = 1;
+    private static final int REL_WIFE = 2;
+    private static final int REL_FATHER = 3;
+    private static final int REL_MOTHER = 4;
+    private static final int REL_SON = 5;
+    private static final int REL_DAUGHTER = 6;
+    private static final int REL_PAT_GRANDFATHER = 7;
+    private static final int REL_PAT_GRANDMOTHER = 8;
+    private static final int REL_MAT_GRANDMOTHER = 9;
+    private static final int REL_GRANDSON = 10;
+    private static final int REL_GRANDDAUGHTER = 11;
+    private static final int REL_FULL_BROTHER = 12;
+    private static final int REL_FULL_SISTER = 13;
+    private static final int REL_CONS_BROTHER = 14;
+    private static final int REL_CONS_SISTER = 15;
+    private static final int REL_UTERINE_BROTHER = 16;
+    private static final int REL_UTERINE_SISTER = 17;
+
     public static class HeirCandidate {
         public FamilyMember member;
-        public String relationName;
-        public int relationId;
+        public RelationType relation;
         public double fractionAssigned = 0.0;
         public boolean isAsabah = false;
+        public int asabahClass = 99; // Lower is higher priority
 
-        public HeirCandidate(FamilyMember member, String relationName, int relationId) {
+        public HeirCandidate(FamilyMember member, RelationType relation) {
             this.member = member;
-            this.relationName = relationName;
-            this.relationId = relationId;
+            this.relation = relation;
         }
     }
 
-    //Overloaded method for backward compatibility if Wasiyat and Liabilities are not provided.
     public CalculationRun calculateFaraid(FamilyMember deceased, 
                                           List<FamilyMember> allFamilyMembers, 
                                           List<DeceasedHeir> heirMappings,
@@ -47,7 +64,6 @@ public class FaraidCalculationService {
                                blockingRules, shareRules, assets, new ArrayList<>(), new ArrayList<>());
     }
 
-    //main calculation engine evaluating the entire Faraid mathematical structure.
     public CalculationRun calculateFaraid(FamilyMember deceased, 
                                           List<FamilyMember> allFamilyMembers, 
                                           List<DeceasedHeir> heirMappings,
@@ -62,7 +78,6 @@ public class FaraidCalculationService {
         run.setRunDate(new Date());
         run.setDeceasedId(deceased.getMemberId());
 
-        // Step 1: Net Estate Computation (Assets - Liabilities - Wasiyat)
         double grossEstate = calculateTotalAssetValue(assets);
         double totalLiabilities = calculateTotalLiabilities(liabilities);
         double totalWasiyat = calculateTotalWasiyat(wasiyats, grossEstate - totalLiabilities);
@@ -74,28 +89,22 @@ public class FaraidCalculationService {
         }
         run.setNetEstate(BigDecimal.valueOf(netEstate));
 
-        // Step 2: Establish the alive candidates
         List<HeirCandidate> livingHeirs = determineLivingHeirs(deceased, allFamilyMembers, heirMappings, relationTypes);
-
-        // Step 3: Apply Al-Hajb (Blocking Rules)
         List<HeirCandidate> eligibleHeirs = applyBlockingRules(livingHeirs, blockingRules);
 
-        // Step 4: Determine conditions (e.g. are there children?)
-        boolean hasChild = eligibleHeirs.stream().anyMatch(h -> 
-            h.relationName.toLowerCase().contains("son") || 
-            h.relationName.toLowerCase().contains("daughter"));
+        // Derive contextual facts dynamically from Database columns ("gender" and "category")
+        boolean hasChildOrGrandchild = eligibleHeirs.stream()
+            .anyMatch(h -> h.relation.getCategory() != null && h.relation.getCategory().contains("Descendant"));
             
-        boolean hasMaleChild = eligibleHeirs.stream().anyMatch(h -> 
-            h.relationName.toLowerCase().contains("son") && !h.relationName.toLowerCase().contains("grand"));
+        boolean hasMaleDescendant = eligibleHeirs.stream()
+            .anyMatch(h -> h.relation.getCategory() != null && h.relation.getCategory().contains("Descendant") && 
+                           "M".equalsIgnoreCase(h.member.getGender()));
 
-        long siblingCount = eligibleHeirs.stream().filter(h -> 
-            h.relationName.toLowerCase().contains("brother") || 
-            h.relationName.toLowerCase().contains("sister")).count();
+        long siblingCount = eligibleHeirs.stream()
+            .filter(h -> h.relation.getCategory() != null && h.relation.getCategory().contains("Sibling")).count();
 
-        // Step 5: Assign Zawil Furuz (Fixed preset shares) based on family state
-        double totalFractions = assignFixedShares(eligibleHeirs, shareRules, hasChild, hasMaleChild, siblingCount);
+        double totalFractions = assignFixedShares(eligibleHeirs, shareRules, hasChildOrGrandchild, hasMaleDescendant, siblingCount);
 
-        // Step 6: Resolve Awl (Over-subscription) or Asabah (Residuaries) and Radd (Return)
         if (totalFractions > 1.0) {
             applyAwl(eligibleHeirs, totalFractions);
         } else if (totalFractions < 1.0) {
@@ -107,58 +116,49 @@ public class FaraidCalculationService {
             }
         }
 
-        // Step 7: Finalize monetary allocations
+        // Dual capacity fallback: Father or Grandfather takes the rest if daughters maxed out shares but left remainder
+        if (!eligibleHeirs.stream().anyMatch(h -> h.isAsabah) && !hasMaleDescendant && hasChildOrGrandchild) {
+            double finalSum = eligibleHeirs.stream().mapToDouble(h -> h.fractionAssigned).sum();
+            if (finalSum < 1.0) {
+                HeirCandidate dualCapacity = eligibleHeirs.stream()
+                    .filter(h -> h.relation.getRelationId() == REL_FATHER || h.relation.getRelationId() == REL_PAT_GRANDFATHER)
+                    .findFirst().orElse(null);
+                if (dualCapacity != null) {
+                    dualCapacity.fractionAssigned += (1.0 - finalSum);
+                }
+            }
+        }
+
         List<AssetAllocation> allocations = processMonetaryAllocations(eligibleHeirs, netEstate);
         
         return run;
     }
 
     private double calculateTotalAssetValue(List<Asset> assets) {
-        return assets.stream()
-            .mapToDouble(a -> a.getCurrentValue() != null ? a.getCurrentValue().doubleValue() : 0.0)
-            .sum();
+        return assets.stream().mapToDouble(a -> a.getCurrentValue() != null ? a.getCurrentValue().doubleValue() : 0.0).sum();
     }
 
     private double calculateTotalLiabilities(List<Liability> liabilities) {
         if (liabilities == null) return 0.0;
-        return liabilities.stream()
-            .mapToDouble(l -> l.getAmount() != null ? l.getAmount().doubleValue() : 0.0)
-            .sum();
+        return liabilities.stream().mapToDouble(l -> l.getAmount() != null ? l.getAmount().doubleValue() : 0.0).sum();
     }
 
     private double calculateTotalWasiyat(List<Wasiyat> wasiyats, double availableEstate) {
         if (wasiyats == null || availableEstate <= 0) return 0.0;
-        double sum = wasiyats.stream()
-            .mapToDouble(w -> w.getAmount() != null ? w.getAmount().doubleValue() : 0.0)
-            .sum();
-        
-        // Wasiyat cannot exceed 1/3 of the estate after debts
-        double maxAllowable = availableEstate / 3.0;
-        return Math.min(sum, maxAllowable);
+        double sum = wasiyats.stream().mapToDouble(w -> w.getAmount() != null ? w.getAmount().doubleValue() : 0.0).sum();
+        return Math.min(sum, availableEstate / 3.0);
     }
 
-    private List<HeirCandidate> determineLivingHeirs(FamilyMember deceased, 
-                                                     List<FamilyMember> allFamilyMembers,
-                                                     List<DeceasedHeir> heirMappings,
-                                                     List<RelationType> relationTypes) {
+    private List<HeirCandidate> determineLivingHeirs(FamilyMember deceased, List<FamilyMember> allFamilyMembers, 
+                                                     List<DeceasedHeir> heirMappings, List<RelationType> relationTypes) {
         List<HeirCandidate> livingHeirs = new ArrayList<>();
-        
         for (DeceasedHeir mapping : heirMappings) {
             if (mapping.getDeceasedId() == deceased.getMemberId()) {
-                FamilyMember member = allFamilyMembers.stream()
-                        .filter(m -> m.getMemberId() == mapping.getHeirId())
-                        .findFirst().orElse(null);
-                        
-                RelationType relation = relationTypes.stream()
-                        .filter(r -> r.getRelationId() == mapping.getRelationId())
-                        .findFirst().orElse(null);
-                        
-                if (member != null && relation != null) {
-                    // Heir must be alive at the time of the deceased's passing
-                    if (member.getDateOfDeath() == null || 
-                       (deceased.getDateOfDeath() != null && member.getDateOfDeath().after(deceased.getDateOfDeath()))) {
-                        livingHeirs.add(new HeirCandidate(member, relation.getRelationName(), relation.getRelationId()));
-                    }
+                FamilyMember member = allFamilyMembers.stream().filter(m -> m.getMemberId() == mapping.getHeirId()).findFirst().orElse(null);
+                RelationType relation = relationTypes.stream().filter(r -> r.getRelationId() == mapping.getRelationId()).findFirst().orElse(null);
+                
+                if (member != null && relation != null && (member.getDateOfDeath() == null || (deceased.getDateOfDeath() != null && member.getDateOfDeath().after(deceased.getDateOfDeath())))) {
+                    livingHeirs.add(new HeirCandidate(member, relation));
                 }
             }
         }
@@ -166,35 +166,25 @@ public class FaraidCalculationService {
     }
 
     private List<HeirCandidate> applyBlockingRules(List<HeirCandidate> candidates, List<FaraidBlockingRule> blockingRules) {
-        List<Integer> presentRelationIds = candidates.stream()
-                .map(c -> c.relationId)
-                .collect(Collectors.toList());
-
-        // A relation is blocked if any of its defined blockers exist in the current candidate pool
+        List<Integer> presentRelationIds = candidates.stream().map(c -> c.relation.getRelationId()).collect(Collectors.toList());
         List<Integer> blockedRelationIds = blockingRules.stream()
                 .filter(rule -> presentRelationIds.contains(rule.getBlockingRelationId()))
-                .map(FaraidBlockingRule::getTargetRelationId)
-                .collect(Collectors.toList());
+                .map(FaraidBlockingRule::getTargetRelationId).collect(Collectors.toList());
 
-        return candidates.stream()
-                .filter(c -> !blockedRelationIds.contains(c.relationId))
-                .collect(Collectors.toList());
+        return candidates.stream().filter(c -> !blockedRelationIds.contains(c.relation.getRelationId())).collect(Collectors.toList());
     }
 
     private double assignFixedShares(List<HeirCandidate> heirs, List<ShareRule> rules, 
-                                     boolean hasChild, boolean hasMaleChild, long siblingCount) {
+                                     boolean hasChild, boolean hasMaleDescendant, long siblingCount) {
         double totalFractions = 0.0;
-
-        // Group heirs by relation to split shares evenly among identical relations (e.g. 3 daughters sharing 2/3)
-        var groupedHeirs = heirs.stream().collect(Collectors.groupingBy(h -> h.relationId));
+        var groupedHeirs = heirs.stream().collect(Collectors.groupingBy(h -> h.relation.getRelationId()));
 
         for (var entry : groupedHeirs.entrySet()) {
             int relId = entry.getKey();
             List<HeirCandidate> group = entry.getValue();
-            HeirCandidate rep = group.get(0);
+            RelationType relation = group.get(0).relation;
             
-            // Determine condition logic contextually
-            String conditionMatch = determineConditionState(rep.relationName, hasChild, hasMaleChild, siblingCount, group.size());
+            String conditionMatch = determineConditionState(relation, hasChild, siblingCount, group.size());
 
             ShareRule appliedRule = rules.stream()
                     .filter(r -> r.getRelationId() == relId && 
@@ -202,14 +192,19 @@ public class FaraidCalculationService {
                     .findFirst().orElse(null);
 
             if (appliedRule != null && appliedRule.getDenominator() > 0) {
-                double totalGroupShare = (double) appliedRule.getNumerator() / appliedRule.getDenominator();
-                
-                // Special Ta'seeb (Residuary) overrides: A daughter with a son becomes Asabah, losing fixed fraction
-                if (rep.relationName.toLowerCase().contains("daughter") && hasMaleChild) {
-                    group.forEach(h -> h.isAsabah = true);
-                } else if (rep.relationName.toLowerCase().contains("son")) {
-                    group.forEach(h -> h.isAsabah = true); // Sons are primarily Asabah
+                // Female Ta'seeb checks (e.g. Daughters become Asabah if Son exists)
+                // Dynamically check if a male of the EXACT same category is present
+                boolean maleCounterpartExists = heirs.stream().anyMatch(h -> 
+                    "M".equalsIgnoreCase(h.member.getGender()) && 
+                    h.relation.getCategory() != null &&
+                    h.relation.getCategory().equals(relation.getCategory()) && 
+                    h.relation.getRelationId() != relation.getRelationId() // Not themselves
+                );
+
+                if ("F".equalsIgnoreCase(group.get(0).member.getGender()) && maleCounterpartExists) {
+                    group.forEach(h -> setupAsabah(h, getAsabahClass(relation.getCategory())));
                 } else {
+                    double totalGroupShare = (double) appliedRule.getNumerator() / appliedRule.getDenominator();
                     double individualShare = totalGroupShare / group.size();
                     for (HeirCandidate h : group) {
                         h.fractionAssigned = individualShare;
@@ -217,69 +212,82 @@ public class FaraidCalculationService {
                     }
                 }
             } else {
-                // If no fixed rule applies gracefully, assume they are residuary candidates
-                group.forEach(h -> h.isAsabah = true);
+                // If no fractional rule matched in the database, they naturally default to Asabah
+                for (HeirCandidate h : group) {
+                    setupAsabah(h, getAsabahClass(relation.getCategory()));
+                }
             }
         }
         return totalFractions;
     }
 
-    private String determineConditionState(String relation, boolean hasChild, boolean hasMaleChild, long siblingCount, int groupSize) {
-        String lowerRel = relation.toLowerCase();
+    private int getAsabahClass(String category) {
+        if (category == null) return 99;
+        if (category.contains("Descendant")) return 1;
+        if (category.contains("Ascendant")) return 2;
+        if (category.contains("Sibling")) return 3;
+        if (category.contains("Extended")) return 4;
+        return 99;
+    }
+
+    private void setupAsabah(HeirCandidate h, int asabahClass) {
+        h.isAsabah = true;
+        h.asabahClass = asabahClass;
+    }
+
+    private String determineConditionState(RelationType relation, boolean hasChild, long siblingCount, int groupSize) {
+        int relId = relation.getRelationId();
+
+        if (relId == REL_HUSBAND || relId == REL_WIFE) return hasChild ? "WITH_CHILD" : "NO_CHILD";
+        if (relId == REL_MOTHER) return (hasChild || siblingCount > 1) ? "WITH_CHILD_OR_SIBLING" : "NO_CHILD";
+        if (relId == REL_FATHER) return hasChild ? "WITH_CHILD" : "DEFAULT";
         
-        if (lowerRel.contains("wife") || lowerRel.contains("husband")) {
-            return hasChild ? "WITH_CHILD" : "NO_CHILD";
+        // Single vs Multiple conditions for females receiving fractions
+        if (relId == REL_DAUGHTER || relId == REL_GRANDDAUGHTER || 
+            relId == REL_FULL_SISTER || relId == REL_CONS_SISTER || relId == REL_UTERINE_SISTER) {
+            return groupSize > 1 ? "MULTIPLE" : "ONLY_ONE";
         }
-        if (lowerRel.contains("mother")) {
-            if (hasChild || siblingCount > 1) return "WITH_CHILD_OR_SIBLINGS";
-            return "DEFAULT";
-        }
-        if (lowerRel.contains("daughter")) {
-            return groupSize > 1 ? "MULTIPLE" : "SINGLE";
-        }
-        if (lowerRel.contains("sister")) {
-            return groupSize > 1 ? "MULTIPLE" : "SINGLE";
-        }
+        
         return "DEFAULT";
     }
 
     private void applyAwl(List<HeirCandidate> heirs, double totalFractions) {
-        // Proportional reduction by shifting the base denominator
         for (HeirCandidate h : heirs) {
-            if (h.fractionAssigned > 0) {
-                h.fractionAssigned = h.fractionAssigned / totalFractions;
-            }
+            if (h.fractionAssigned > 0) h.fractionAssigned /= totalFractions;
         }
     }
 
     private boolean distributeToAsabah(List<HeirCandidate> heirs, double remainder) {
-        List<HeirCandidate> asabahList = heirs.stream()
-                .filter(h -> h.isAsabah)
-                .collect(Collectors.toList());
+        List<HeirCandidate> allAsabah = heirs.stream().filter(h -> h.isAsabah).collect(Collectors.toList());
+        if (allAsabah.isEmpty()) return false;
 
-        if (asabahList.isEmpty()) return false;
+        int topClass = allAsabah.stream().mapToInt(h -> h.asabahClass).min().orElse(99);
+        List<HeirCandidate> activeAsabah = allAsabah.stream().filter(h -> h.asabahClass == topClass).collect(Collectors.toList());
 
-        // Calculate relative weights. Male = 2, Female = 1.
+        // Uterine siblings exception - check specific ID mapped to Uterine category
+        boolean isUterine = activeAsabah.stream().anyMatch(h -> 
+            h.relation.getRelationId() == REL_UTERINE_BROTHER || h.relation.getRelationId() == REL_UTERINE_SISTER);
+
         double totalWeight = 0;
-        for (HeirCandidate a : asabahList) {
-            if (isMaleRelation(a.relationName)) totalWeight += 2.0;
-            else totalWeight += 1.0;
+        for (HeirCandidate a : activeAsabah) {
+            if (isUterine) {
+                totalWeight += 1.0; // 1:1 sharing exception
+            } else {
+                totalWeight += "M".equalsIgnoreCase(a.member.getGender()) ? 2.0 : 1.0; // 2:1 mapping
+            }
         }
 
-        for (HeirCandidate a : asabahList) {
-            double weight = isMaleRelation(a.relationName) ? 2.0 : 1.0;
-            a.fractionAssigned = remainder * (weight / totalWeight);
+        for (HeirCandidate a : activeAsabah) {
+            double weight = 1.0;
+            if (!isUterine && "M".equalsIgnoreCase(a.member.getGender())) weight = 2.0;
+            a.fractionAssigned += remainder * (weight / totalWeight); 
         }
-        
         return true;
     }
 
     private void applyRadd(List<HeirCandidate> heirs, double currentTotal) {
-        // Exclude spouses from Radd in classic Faraid
         List<HeirCandidate> raddEligible = heirs.stream()
-                .filter(h -> h.fractionAssigned > 0 && 
-                             !h.relationName.toLowerCase().contains("wife") && 
-                             !h.relationName.toLowerCase().contains("husband"))
+                .filter(h -> h.fractionAssigned > 0 && (h.relation.getCategory() == null || !h.relation.getCategory().equalsIgnoreCase("Spouse")))
                 .collect(Collectors.toList());
 
         if (raddEligible.isEmpty()) return;
@@ -293,31 +301,16 @@ public class FaraidCalculationService {
         }
     }
 
-    private boolean isMaleRelation(String relation) {
-        String r = relation.toLowerCase();
-        return r.contains("son") || r.contains("brother") || r.contains("father") || 
-               r.contains("husband") || r.contains("uncle") || r.contains("nephew");
-    }
-
     private List<AssetAllocation> processMonetaryAllocations(List<HeirCandidate> heirs, double netValue) {
         List<AssetAllocation> allocations = new ArrayList<>();
-        
         for (HeirCandidate h : heirs) {
             if (h.fractionAssigned <= 0) continue;
 
-            double amount = netValue * h.fractionAssigned;
-            double percentage = h.fractionAssigned * 100.0;
-
             AssetAllocation allocation = new AssetAllocation();
             allocation.setHeirId(h.member.getMemberId());
-            
-            BigDecimal bdPct = BigDecimal.valueOf(percentage).setScale(4, RoundingMode.HALF_UP);
-            BigDecimal bdAmt = BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP);
-            
-            allocation.setAllocatedPercentage(bdPct);
-            allocation.setAllocatedValue(bdAmt);
+            allocation.setAllocatedPercentage(BigDecimal.valueOf(h.fractionAssigned * 100.0).setScale(4, RoundingMode.HALF_UP));
+            allocation.setAllocatedValue(BigDecimal.valueOf(netValue * h.fractionAssigned).setScale(2, RoundingMode.HALF_UP));
             allocation.setFinalized(false);
-            
             allocations.add(allocation);
         }
         return allocations;
