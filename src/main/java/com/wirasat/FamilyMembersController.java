@@ -209,6 +209,8 @@ public class FamilyMembersController implements Initializable {
             // Ask for actual death date — critical for Faraid eligibility
             Dialog<Date> dialog = new Dialog<>();
             dialog.setTitle("Set Date of Death");
+            dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+            dialog.getDialogPane().getStyleClass().add("dark-panel");
             FamilyMember deceased = db.getDeceased();
             String note = deceased != null
                     ? "If they died BEFORE " + dateFormat.format(deceased.getDateOfDeath()) + ", they will NOT inherit."
@@ -271,6 +273,8 @@ public class FamilyMembersController implements Initializable {
         Dialog<FamilyMember> dialog = new Dialog<>();
         dialog.setTitle("Add " + defaultRole);
         dialog.setHeaderText("Adding " + defaultRole + " of " + deceased.getName());
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dark-panel");
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 

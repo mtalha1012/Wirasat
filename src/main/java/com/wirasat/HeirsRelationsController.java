@@ -68,6 +68,8 @@ public class HeirsRelationsController implements Initializable {
         Dialog<DeceasedHeir> dialog = new Dialog<>();
         dialog.setTitle("Map New Heir Relation");
         dialog.setHeaderText("Map an heir to " + deceased.getName());
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dark-panel");
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 

@@ -79,12 +79,29 @@ public class DistributionController implements Initializable {
                     estateWasiyat
             );
 
-            // Build transparent summary
+            // Build transparent summary showing the math working
+            BigDecimal gross = estateAssets.stream()
+                    .map(a -> a.getValue() != null ? a.getValue() : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalLiab = estateLiab.stream()
+                    .map(l -> l.getAmount() != null ? l.getAmount() : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalWasiyat = estateWasiyat.stream()
+                    .map(w -> w.getAmount() != null ? w.getAmount() : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal maxWasiyat = gross.subtract(totalLiab).divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
+            BigDecimal executedWasiyat = totalWasiyat.compareTo(maxWasiyat) > 0 ? maxWasiyat : totalWasiyat;
+
             StringBuilder sb = new StringBuilder();
+            sb.append("Estate Math: Gross ").append(format.format(gross))
+              .append(" - Liab ").append(format.format(totalLiab))
+              .append(" - Will ").append(format.format(executedWasiyat));
+            if (totalWasiyat.compareTo(maxWasiyat) > 0) sb.append(" (capped)");
+
             String netStr = lastRun.getNetEstate() != null ? format.format(lastRun.getNetEstate()) : "Rs 0";
-            sb.append("✓ Net Estate: ").append(netStr);
-            sb.append("\nHeir Mappings: ").append(heirMappings.size());
-            sb.append(" → Eligible (alive + unblocked): ").append(lastRun.getAllocations().size());
+            sb.append("\n✓ Net Estate: ").append(netStr);
+            sb.append("   → Total Heirs Mapped: ").append(heirMappings.size());
+            sb.append("   → Eligible (alive & unblocked): ").append(lastRun.getAllocations().size());
 
             // Show who was excluded
             Set<Integer> allocatedIds = lastRun.getAllocations().stream()
@@ -148,6 +165,10 @@ public class DistributionController implements Initializable {
                 .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                 .collect(Collectors.toList());
 
+        List<Asset> remainingToSplit = estateAssets.stream()
+                .filter(Asset::isShareable)
+                .collect(Collectors.toList());
+
         for (Asset asset : nonShareable) {
             int bestHeir = -1;
             BigDecimal bestGap = null;
@@ -160,23 +181,19 @@ public class DistributionController implements Initializable {
                     }
                 }
             }
-            if (bestHeir == -1) { // fallback: largest gap
-                BigDecimal maxGap = BigDecimal.ZERO;
-                for (Map.Entry<Integer, BigDecimal> e : heirTargetValues.entrySet()) {
-                    BigDecimal gap = e.getValue().subtract(running.getOrDefault(e.getKey(), BigDecimal.ZERO));
-                    if (gap.compareTo(maxGap) > 0) { maxGap = gap; bestHeir = e.getKey(); }
-                }
-            }
             if (bestHeir != -1) {
                 Map<Integer, BigDecimal> splits = new LinkedHashMap<>();
                 splits.put(bestHeir, BigDecimal.valueOf(100));
                 assetAssignments.put(asset.getAssetId(), splits);
                 running.put(bestHeir, running.get(bestHeir).add(asset.getValue()));
+            } else {
+                // If the non-shareable asset is too large to fit in any remaining gap,
+                // we MUST split it to reach exactly 100% distributed percent, otherwise it stays orphaned.
+                remainingToSplit.add(asset);
             }
         }
 
-        // Phase 2: Shareable → fill remaining GAPS after non-shareables
-        // Calculate how much each heir still needs
+        // Phase 2: Shareable and Oversized assets → fill remaining GAPS proportionally
         Map<Integer, BigDecimal> gaps = new LinkedHashMap<>();
         BigDecimal totalGap = BigDecimal.ZERO;
         for (Map.Entry<Integer, BigDecimal> e : heirTargetValues.entrySet()) {
@@ -186,17 +203,11 @@ public class DistributionController implements Initializable {
             totalGap = totalGap.add(gap);
         }
 
-        List<Asset> shareable = estateAssets.stream()
-                .filter(Asset::isShareable)
-                .collect(Collectors.toList());
-
-        for (Asset asset : shareable) {
+        for (Asset asset : remainingToSplit) {
             Map<Integer, BigDecimal> splits = new LinkedHashMap<>();
             if (totalGap.compareTo(BigDecimal.ZERO) > 0) {
-                // Split this asset in proportion to each heir's remaining gap
                 for (Map.Entry<Integer, BigDecimal> e : gaps.entrySet()) {
                     if (e.getValue().compareTo(BigDecimal.ZERO) > 0) {
-                        // This heir's share of THIS asset = (their gap / total gap) * 100%
                         BigDecimal pct = e.getValue()
                                 .multiply(BigDecimal.valueOf(100))
                                 .divide(totalGap, 4, RoundingMode.HALF_UP);
@@ -205,13 +216,13 @@ public class DistributionController implements Initializable {
                 }
             }
             assetAssignments.put(asset.getAssetId(), splits);
-            // Update running totals and gaps for next shareable asset
+            
             for (Map.Entry<Integer, BigDecimal> s : splits.entrySet()) {
                 BigDecimal portion = asset.getValue().multiply(s.getValue())
                         .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
                 running.merge(s.getKey(), portion, BigDecimal::add);
             }
-            // Recalculate gaps for next shareable
+            
             totalGap = BigDecimal.ZERO;
             for (Map.Entry<Integer, BigDecimal> e : heirTargetValues.entrySet()) {
                 BigDecimal gap = e.getValue().subtract(running.getOrDefault(e.getKey(), BigDecimal.ZERO));
@@ -337,25 +348,18 @@ public class DistributionController implements Initializable {
 
             box.getChildren().addAll(titleRow, valLbl);
 
+            Map<Integer, BigDecimal> curSplit = assetAssignments.getOrDefault(asset.getAssetId(), Collections.emptyMap());
+            boolean isSplit = curSplit.size() > 1;
+
             if (isSh) {
-                // Shareable: show proportional split
-                Map<Integer, BigDecimal> splits = assetAssignments.getOrDefault(asset.getAssetId(), Collections.emptyMap());
-                if (!splits.isEmpty()) {
-                    for (Map.Entry<Integer, BigDecimal> sp : splits.entrySet()) {
-                        FamilyMember h = db.getMemberById(sp.getKey());
-                        BigDecimal portion = asset.getValue().multiply(sp.getValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-                        Label l = new Label("  • " + (h != null ? h.getName() : "?") + ": " +
-                                sp.getValue().setScale(1, RoundingMode.HALF_UP) + "% = " + format.format(portion));
-                        l.setStyle("-fx-text-fill: #d1d5db; -fx-font-size: 11px;");
-                        box.getChildren().add(l);
-                    }
-                } else {
+                // Shareable: always treated as proportional
+                if (curSplit.isEmpty()) {
                     Label n = new Label("Run Auto-Assign to split across heirs");
                     n.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
                     box.getChildren().add(n);
                 }
             } else {
-                // Non-shareable: ComboBox
+                // Non-shareable: Provide ComboBox for manual override
                 HBox cc = new HBox(8); cc.setAlignment(Pos.CENTER_LEFT);
                 Label l = new Label("Assign to:"); l.setStyle("-fx-text-fill: #9ca3af;");
                 ComboBox<String> hc = new ComboBox<>();
@@ -367,22 +371,24 @@ public class DistributionController implements Initializable {
                 hc.setMaxWidth(Double.MAX_VALUE);
                 HBox.setHgrow(hc, Priority.ALWAYS);
 
-                Map<Integer, BigDecimal> curSplit = assetAssignments.getOrDefault(asset.getAssetId(), Collections.emptyMap());
-                Optional<Map.Entry<Integer, BigDecimal>> cur = curSplit.entrySet().stream().findFirst();
-                if (cur.isPresent()) {
-                    FamilyMember ch = db.getMemberById(cur.get().getKey());
+                if (curSplit.size() == 1) {
+                    int chId = curSplit.entrySet().iterator().next().getKey();
+                    FamilyMember ch = db.getMemberById(chId);
                     if (ch != null) {
                         BigDecimal p = heirPercentages.getOrDefault(ch.getMemberId(), BigDecimal.ZERO);
                         hc.setValue(ch.getMemberId() + " : " + ch.getName() + " (" + p.setScale(1, RoundingMode.HALF_UP) + "%)");
                     }
+                } else if (isSplit) {
+                    hc.getItems().add("— JOINTLY SHARED (AUTO) —");
+                    hc.setValue("— JOINTLY SHARED (AUTO) —");
                 } else {
                     hc.setValue("— UNASSIGNED —");
                 }
 
                 hc.setOnAction(ev -> {
                     String val = hc.getValue();
-                    if (val == null || val.startsWith("—")) {
-                        assetAssignments.remove(asset.getAssetId());
+                    if (val == null || val.startsWith("— UN") || val.startsWith("— JOINT")) {
+                        if (val != null && val.startsWith("— UN")) assetAssignments.remove(asset.getAssetId());
                     } else {
                         int newHeir = Integer.parseInt(val.split(" : ")[0].trim());
                         Map<Integer, BigDecimal> sp = new LinkedHashMap<>();
@@ -393,6 +399,18 @@ public class DistributionController implements Initializable {
                 });
                 cc.getChildren().addAll(l, hc);
                 box.getChildren().add(cc);
+            }
+
+            // Print the breakdown for BOTH shareable and split unshareables
+            if (!curSplit.isEmpty() && (isSh || isSplit)) {
+                for (Map.Entry<Integer, BigDecimal> sp : curSplit.entrySet()) {
+                    FamilyMember h = db.getMemberById(sp.getKey());
+                    BigDecimal portion = asset.getValue().multiply(sp.getValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                    Label lb = new Label("  • " + (h != null ? h.getName() : "?") + ": " +
+                            sp.getValue().setScale(2, RoundingMode.HALF_UP) + "% = " + format.format(portion));
+                    lb.setStyle("-fx-text-fill: #d1d5db; -fx-font-size: 11px;");
+                    box.getChildren().add(lb);
+                }
             }
             assetCardsContainer.getChildren().add(box);
         }

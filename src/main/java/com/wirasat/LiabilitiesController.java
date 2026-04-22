@@ -59,6 +59,8 @@ public class LiabilitiesController implements Initializable {
     private void showEditDialog(Liability l) {
         Dialog<Liability> dialog = new Dialog<>();
         dialog.setTitle("Edit Liability");
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dark-panel");
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
@@ -92,6 +94,8 @@ public class LiabilitiesController implements Initializable {
         Dialog<Liability> dialog = new Dialog<>();
         dialog.setTitle("Add Liability");
         dialog.setHeaderText("New debt owed by " + deceased.getName());
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dark-panel");
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 

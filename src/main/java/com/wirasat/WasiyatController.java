@@ -62,6 +62,8 @@ public class WasiyatController implements Initializable {
     private void showEditDialog(Wasiyat w) {
         Dialog<Wasiyat> dialog = new Dialog<>();
         dialog.setTitle("Edit Wasiyat");
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dark-panel");
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
@@ -106,6 +108,8 @@ public class WasiyatController implements Initializable {
         Dialog<Wasiyat> dialog = new Dialog<>();
         dialog.setTitle("Add Wasiyat");
         dialog.setHeaderText("New will from " + deceased.getName() + " (max 1/3 of estate)");
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dark-panel");
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
