@@ -6,6 +6,7 @@ public class Asset {
     private int typeId;
     private int ownerId;
     private boolean isShareable;
+    private java.math.BigDecimal value;
 
     public Asset() {
     }
@@ -50,6 +51,7 @@ public class Asset {
         this.ownerId = ownerId;
     }
 
+    public java.math.BigDecimal getValue() { return java.math.BigDecimal.ZERO; }
     public boolean isShareable() {
         return isShareable;
     }
