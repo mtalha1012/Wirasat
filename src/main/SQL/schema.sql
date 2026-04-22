@@ -145,12 +145,13 @@ CREATE TABLE asset_allocations(
 	allocation_id INT AUTO_INCREMENT,
     asset_id INT,
     heir_id INT,
+    run_id INT,
     allocated_percentage DECIMAL(5, 2),
     allocated_value DECIMAL(15, 2),
     is_finalized BOOLEAN DEFAULT FALSE,
     
     CONSTRAINT percentage_chk
-		CHECK(allocated_percentege BETWEEN 0 and 100),
+		CHECK(allocated_percentage BETWEEN 0 and 100),
     CONSTRAINT asset_allocations_pk
 		PRIMARY KEY(allocation_id),
 	CONSTRAINT asset_allocations_asset_fk
@@ -158,7 +159,10 @@ CREATE TABLE asset_allocations(
         assets(asset_id),
 	CONSTRAINT asset_allocations_heir_fk
 		FOREIGN KEY(heir_id) REFERENCES
-        family_members(member_id)
+        family_members(member_id),
+	CONSTRAINT asset_allocations_run_fk
+		FOREIGN KEY(run_id) REFERENCES
+        calculation_runs(run_id)
 	);
     
 CREATE TABLE calculation_runs(
