@@ -1,7 +1,7 @@
-CREATE DATABASE wirasat;
+CREATE DATABASE IF NOT EXISTS wirasat;
 USE wirasat;
 
-CREATE TABLE asset_types(
+CREATE TABLE IF NOT EXISTS asset_types(
 	type_id INT AUTO_INCREMENT,
     category_name VARCHAR(30),
     
@@ -9,7 +9,7 @@ CREATE TABLE asset_types(
 		PRIMARY KEY(type_id)
     );
     
-CREATE TABLE family_members(
+CREATE TABLE IF NOT EXISTS family_members(
     member_id INT AUTO_INCREMENT,
     cnic VARCHAR(15) UNIQUE,
     name VARCHAR(100) NOT NULL,
@@ -37,16 +37,25 @@ CREATE TABLE family_members(
         family_members(member_id)
     );
     
-CREATE TABLE relation_types(
-	relation_id INT AUTO_INCREMENT,
-    relation_name VARCHAR(50) UNIQUE,
-    category VARCHAR(50),
-    
-    CONSTRAINT relation_types_pk
-		PRIMARY KEY(relation_id)
+CREATE TABLE IF NOT EXISTS relation_categories(
+	category_id   INT AUTO_INCREMENT,
+    category_name VARCHAR(50) UNIQUE NOT NULL,
+    CONSTRAINT relation_categories_pk PRIMARY KEY (category_id)
 	);
     
-CREATE TABLE deceased_heirs(
+CREATE TABLE IF NOT EXISTS relation_types(
+	relation_id INT AUTO_INCREMENT,
+    relation_name VARCHAR(50) UNIQUE,
+    category_id INT,
+    
+    CONSTRAINT relation_types_pk
+		PRIMARY KEY(relation_id),
+	CONSTRAINT relation_types_category_fk
+		FOREIGN KEY (category_id) REFERENCES 
+		relation_categories(category_id)
+	);
+    
+CREATE TABLE IF NOT EXISTS deceased_heirs(
 	mapping_id INT AUTO_INCREMENT,
     deceased_id INT,
     heir_id INT,
@@ -69,7 +78,7 @@ CREATE TABLE deceased_heirs(
 		CHECK (deceased_id != heir_id)
 	);
     
-CREATE TABLE liabilities(
+CREATE TABLE IF NOT EXISTS liabilities(
 	liability_id INT AUTO_INCREMENT,
     details VARCHAR(255),
     amount DECIMAL(15,2),
@@ -82,20 +91,36 @@ CREATE TABLE liabilities(
         family_members(member_id)
 	);
     
-CREATE TABLE beneficiaries(
+CREATE TABLE IF NOT EXISTS beneficiary_types (
+    type_id   INT AUTO_INCREMENT,
+    type_name VARCHAR(30) UNIQUE NOT NULL,
+
+    CONSTRAINT beneficiary_types_pk
+        PRIMARY KEY (type_id)
+);
+    
+CREATE TABLE IF NOT EXISTS beneficiaries(
 	beneficiary_id INT AUTO_INCREMENT,
     beneficiary_name VARCHAR(100),
-	beneficiary_type VARCHAR(30),
+	beneficiary_type INT,
     member_id INT NULL,
     
     CONSTRAINT beneficiary_pk
 		PRIMARY KEY(beneficiary_id),
 	CONSTRAINT beneficiary_member_id
 		FOREIGN KEY(member_id) REFERENCES
-        family_members(member_id)
+        family_members(member_id),
+	CONSTRAINT beneficiary_type_fk
+		FOREIGN KEY(beneficiary_type) REFERENCES
+        beneficiary_types(type_id),
+	CONSTRAINT beneficiary_name_chk
+		CHECK(
+			(member_id IS NOT NULL AND beneficiary_name IS NULL) OR
+            (member_id IS NULL     AND beneficiary_name IS NOT NULL)
+            )
 	);
     
-CREATE TABLE wasiyat(
+CREATE TABLE IF NOT EXISTS wasiyat(
     will_id INT AUTO_INCREMENT,
     deceased_id INT,
     beneficiary_id INT,
@@ -111,7 +136,7 @@ CREATE TABLE wasiyat(
         beneficiaries(beneficiary_id)
     );
     
-CREATE TABLE assets(
+CREATE TABLE IF NOT EXISTS assets(
 	asset_id INT AUTO_INCREMENT,
     asset_name VARCHAR(100),
     type_id INT,
@@ -128,7 +153,7 @@ CREATE TABLE assets(
         family_members(member_id)
 	);
     
-CREATE TABLE valuation_history(
+CREATE TABLE IF NOT EXISTS valuation_history(
 	valuation_history_id INT AUTO_INCREMENT,
 	asset_id INT,
     valuation_date DATETIME,
@@ -141,12 +166,11 @@ CREATE TABLE valuation_history(
         assets(asset_id)
 	);
     
-CREATE TABLE asset_allocations(
+CREATE TABLE IF NOT EXISTS asset_allocations(
 	allocation_id INT AUTO_INCREMENT,
     asset_id INT,
     heir_id INT,
     allocated_percentage DECIMAL(5, 2),
-    allocated_value DECIMAL(15, 2),
     is_finalized BOOLEAN DEFAULT FALSE,
     
     CONSTRAINT percentage_chk
@@ -161,7 +185,7 @@ CREATE TABLE asset_allocations(
         family_members(member_id)
 	);
     
-CREATE TABLE calculation_runs(
+CREATE TABLE IF NOT EXISTS calculation_runs(
 	run_id INT AUTO_INCREMENT,
     deceased_id INT NOT NULL,
     run_date DATETIME NOT NULL DEFAULT NOW(),
@@ -174,19 +198,15 @@ CREATE TABLE calculation_runs(
         family_members(member_id)
 	);
     
-CREATE TABLE distribution_logs(
+CREATE TABLE IF NOT EXISTS distribution_logs(
 	log_id INT AUTO_INCREMENT,
     share_fraction DECIMAL(10, 8),
     share_amount DECIMAL(12, 2),
-    deceased_id INT,
     heir_id INT,
     run_id INT,
     
     CONSTRAINT distribution_logs_pk
 		PRIMARY KEY(log_id),
-	CONSTRAINT distribution_logs_deceased_fk
-		FOREIGN KEY(deceased_id) REFERENCES
-        family_members(member_id),
 	CONSTRAINT distribution_logs_heir_fk
 		FOREIGN KEY(heir_id) REFERENCES
         family_members(member_id),
@@ -195,7 +215,7 @@ CREATE TABLE distribution_logs(
         calculation_runs(run_id)
 	);
 
-CREATE TABLE faraid_blocking_rules (
+CREATE TABLE IF NOT EXISTS faraid_blocking_rules (
     rule_id INT AUTO_INCREMENT,
     target_relation_id INT,
     blocking_relation_id INT,
@@ -210,16 +230,31 @@ CREATE TABLE faraid_blocking_rules (
         UNIQUE(target_relation_id, blocking_relation_id)
 );
 
-CREATE TABLE share_rules (
+CREATE TABLE condition_types (
+    condition_id   INT AUTO_INCREMENT,
+    condition_name VARCHAR(50) NOT NULL,
+    description    VARCHAR(255),
+
+    CONSTRAINT condition_types_pk
+        PRIMARY KEY (condition_id),
+    CONSTRAINT condition_types_name_uq
+        UNIQUE (condition_name)
+);
+
+CREATE TABLE IF NOT EXISTS share_rules (
     rule_id INT AUTO_INCREMENT,
     relation_id INT NOT NULL,
     numerator INT NOT NULL,
     denominator INT NOT NULL,
-    condition_type VARCHAR(50) DEFAULT 'DEFAULT',
+    condition_type INT,
     
     CONSTRAINT share_rules_pk 
         PRIMARY KEY(rule_id),
     CONSTRAINT share_rules_relation_fk 
-        FOREIGN KEY(relation_id) REFERENCES relation_types(relation_id)
+        FOREIGN KEY(relation_id) REFERENCES 
+        relation_types(relation_id),
+	CONSTRAINT condition_rules_fk
+		FOREIGN KEY(condition_type) REFERENCES
+        condition_types(condition_id)
 );
 

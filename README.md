@@ -15,3 +15,7 @@ removed allocated_value from asset_allocations as it is computable
 beneficiary types were repeating in beneficiaries table so added beneficiary_type
 
 condition type repeating in share_rules table so added conditions_type
+
+Created relation_category table to remove redundancy from relation_types
+
+Added check so that same name is not present at two different places i.e beneficiary_name
