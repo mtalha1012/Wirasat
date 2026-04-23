@@ -107,7 +107,7 @@
 }
 .arabic-text {
     -fx-text-fill: #E2B93B;
-    -fx-font-size: 11px;
+    -fx-font-size: 13px;
     -fx-wrap-text: true;
     -fx-text-alignment: CENTER;
 }

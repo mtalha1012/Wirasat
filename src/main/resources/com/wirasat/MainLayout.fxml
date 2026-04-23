@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -10,10 +11,11 @@
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
-            <VBox spacing="2">
-                <Label text="Wirasat" styleClass="logo-text"/>
-                <Label text="INHERITANCE MANAGER" styleClass="logo-subtext"/>
-            </VBox>
+            <HBox alignment="CENTER">
+                <ImageView fitWidth="180" preserveRatio="true">
+                    <Image url="@logo.png" />
+                </ImageView>
+            </HBox>
             <Region prefHeight="30" /> 
             
             <Button text="Dashboard" styleClass="nav-button, active-nav" onAction="#showDashboard"/>
