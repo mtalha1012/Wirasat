@@ -105,22 +105,7 @@ INSERT INTO share_rules (relation_id, numerator, denominator, condition_type) VA
 (4, 1, 3, 1),
 -- Daughter
 (6, 1, 2, 4),
-(6, 2, 3, 5),
--- Granddaughter (same as daughter if no daughter/son)
-(11, 1, 2, 4),
-(11, 2, 3, 5),
--- Full Sister
-(13, 1, 2, 4),
-(13, 2, 3, 5),
--- Consanguine Sister
-(15, 1, 2, 4),
-(15, 2, 3, 5),
--- Uterine Brother
-(16, 1, 6, 4),
-(16, 1, 3, 5),
--- Uterine Sister
-(17, 1, 6, 4),
-(17, 1, 3, 5);
+(6, 2, 3, 5);
 
 INSERT INTO beneficiary_types (type_id, type_name) VALUES
 (1, 'Individual'),
@@ -143,10 +128,10 @@ INSERT INTO deceased_heirs (mapping_id, deceased_id, heir_id, relation_id) VALUE
 (3, 1, 4, 6),
 (4, 1, 5, 12);
 
-INSERT INTO assets (asset_id, asset_name, type_id, owner_id, is_shareable, value) VALUES
-(1, 'DHA Phase 5 House', 3, 1, TRUE, 35000000.00),
-(2, 'Meezan Bank Savings Account', 1, 1, TRUE, 2500000.00),
-(3, 'Toyota Corolla 2022', 6, 1, TRUE, 5500000.00);
+INSERT INTO assets (asset_id, asset_name, type_id, owner_id, is_shareable) VALUES
+(1, 'DHA Phase 5 House', 3, 1, TRUE),
+(2, 'Meezan Bank Savings Account', 1, 1, TRUE),
+(3, 'Toyota Corolla 2022', 6, 1, TRUE);
 
 INSERT INTO valuation_history (valuation_history_id, asset_id, valuation_date, amount) VALUES
 (1, 1, '2026-01-05', 35000000.00),
