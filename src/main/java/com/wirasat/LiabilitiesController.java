@@ -61,6 +61,8 @@ public class LiabilitiesController implements Initializable {
         dialog.setTitle("Edit Liability");
         dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("dark-panel");
+        javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+        if (window instanceof javafx.stage.Stage) { com.wirasat.util.GUIUtil.setAppIcon((javafx.stage.Stage) window); }
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
@@ -87,7 +89,7 @@ public class LiabilitiesController implements Initializable {
     private void handleAddLiability(ActionEvent event) {
         FamilyMember deceased = db.getDeceased();
         if (deceased == null) {
-            new Alert(Alert.AlertType.WARNING, "Set a principal deceased first.").showAndWait();
+            com.wirasat.util.GUIUtil.showAlert(javafx.scene.control.Alert.AlertType.WARNING, null, "Set a principal deceased first.");
             return;
         }
 
@@ -96,6 +98,8 @@ public class LiabilitiesController implements Initializable {
         dialog.setHeaderText("New debt owed by " + deceased.getName());
         dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("dark-panel");
+        javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+        if (window instanceof javafx.stage.Stage) { com.wirasat.util.GUIUtil.setAppIcon((javafx.stage.Stage) window); }
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 

@@ -47,7 +47,7 @@ public class FamilyMembersController implements Initializable {
     private void handleSetPrincipal(ActionEvent event) {
         if (selectedMember == null) return;
         if (selectedMember.getDateOfDeath() == null) {
-            new Alert(Alert.AlertType.WARNING, "This person is marked as Alive. Mark them as Deceased first before making them the Principal Deceased.").showAndWait();
+            com.wirasat.util.GUIUtil.showAlert(Alert.AlertType.WARNING, null, "This person is marked as Alive. Mark them as Deceased first before making them the Principal Deceased.");
             return;
         }
         db.setPrincipalDeceasedId(selectedMember.getMemberId());
@@ -57,6 +57,8 @@ public class FamilyMembersController implements Initializable {
         info.setHeaderText("Distribution Context Changed");
         info.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
         info.getDialogPane().getStyleClass().add("dark-panel");
+        javafx.stage.Window window = info.getDialogPane().getScene().getWindow();
+        if (window instanceof javafx.stage.Stage) { com.wirasat.util.GUIUtil.setAppIcon((javafx.stage.Stage) window); }
         info.showAndWait();
         
         updateActionPanel();
@@ -259,6 +261,8 @@ public class FamilyMembersController implements Initializable {
             dialog.setTitle("Set Date of Death");
             dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
             dialog.getDialogPane().getStyleClass().add("dark-panel");
+            javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+            if (window instanceof javafx.stage.Stage) { com.wirasat.util.GUIUtil.setAppIcon((javafx.stage.Stage) window); }
             FamilyMember deceased = db.getDeceased();
             String note = deceased != null
                     ? "If they died BEFORE " + dateFormat.format(deceased.getDateOfDeath()) + ", they will NOT inherit."
@@ -290,7 +294,7 @@ public class FamilyMembersController implements Initializable {
     private void handleRemoveNode(ActionEvent event) {
         if (selectedMember == null) return;
         if (selectedMember.getMemberId() == db.getPrincipalDeceasedId()) {
-            new Alert(Alert.AlertType.WARNING, "Cannot remove the principal deceased.").showAndWait();
+            com.wirasat.util.GUIUtil.showAlert(Alert.AlertType.WARNING, null, "Cannot remove the principal deceased.");
             return;
         }
         db.removeFamilyMember(selectedMember);
@@ -311,6 +315,8 @@ public class FamilyMembersController implements Initializable {
         dialog.setHeaderText("Modifying " + m.getName());
         dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("dark-panel");
+        javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+        if (window instanceof javafx.stage.Stage) { com.wirasat.util.GUIUtil.setAppIcon((javafx.stage.Stage) window); }
         ButtonType saveBtn = new ButtonType("Save Changes", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
@@ -433,7 +439,7 @@ public class FamilyMembersController implements Initializable {
     private void quickAdd(String defaultRole, char gender, int defaultRelationId) {
         FamilyMember deceased = db.getDeceased();
         if (deceased == null) {
-            new Alert(Alert.AlertType.WARNING, "Set a principal deceased first.").showAndWait();
+            com.wirasat.util.GUIUtil.showAlert(Alert.AlertType.WARNING, null, "Set a principal deceased first.");
             return;
         }
 
@@ -442,6 +448,8 @@ public class FamilyMembersController implements Initializable {
         dialog.setHeaderText("Adding " + defaultRole + " of " + deceased.getName());
         dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
         dialog.getDialogPane().getStyleClass().add("dark-panel");
+        javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+        if (window instanceof javafx.stage.Stage) { com.wirasat.util.GUIUtil.setAppIcon((javafx.stage.Stage) window); }
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 

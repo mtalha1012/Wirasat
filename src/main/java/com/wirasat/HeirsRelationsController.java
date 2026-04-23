@@ -80,7 +80,7 @@ public class HeirsRelationsController implements Initializable {
     private void handleAddMapping(ActionEvent event) {
         FamilyMember deceased = db.getDeceased();
         if (deceased == null) {
-            new Alert(Alert.AlertType.WARNING, "Set a principal deceased first.").showAndWait();
+            com.wirasat.util.GUIUtil.showAlert(Alert.AlertType.WARNING, null, "Set a principal deceased first.");
             return;
         }
 

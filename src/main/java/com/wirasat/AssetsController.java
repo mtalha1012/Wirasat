@@ -105,6 +105,10 @@ public class AssetsController implements Initializable {
         dialog.getDialogPane().getStyleClass().add("dark-panel");
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
+        javafx.stage.Window window = dialog.getDialogPane().getScene().getWindow();
+        if (window instanceof javafx.stage.Stage) {
+            com.wirasat.util.GUIUtil.setAppIcon((javafx.stage.Stage) window);
+        }
 
         javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
         grid.setHgap(10); grid.setVgap(10);
@@ -177,6 +181,7 @@ public class AssetsController implements Initializable {
             dialogController.setAssetService(assetService);
             javafx.stage.Stage stage = new javafx.stage.Stage();
             stage.setTitle("Add New Asset");
+            com.wirasat.util.GUIUtil.setAppIcon(stage);
             stage.initModality(javafx.stage.Modality.WINDOW_MODAL);
             stage.initOwner(((javafx.scene.Node) event.getSource()).getScene().getWindow());
             javafx.scene.Scene scene = new javafx.scene.Scene(root);
