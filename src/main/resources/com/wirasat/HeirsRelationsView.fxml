@@ -19,9 +19,10 @@
     <TableView fx:id="relationsTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colDeceased" text="Principal (Deceased)" prefWidth="150" />
-            <TableColumn fx:id="colHeir" text="Surviving Heir" prefWidth="250" />
+            <TableColumn fx:id="colHeir" text="Surviving Heir" prefWidth="220" />
             <TableColumn fx:id="colRelation" text="Relationship Status" prefWidth="180" />
-            <TableColumn fx:id="colCategory" text="Relation Group" prefWidth="150" />
+            <TableColumn fx:id="colCategory" text="Relation Group" prefWidth="130" />
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="100" />
         </columns>
     </TableView>
 </VBox>

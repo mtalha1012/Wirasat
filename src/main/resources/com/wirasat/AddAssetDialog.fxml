@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="15" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.AddAssetDialogController">
+<VBox spacing="15" stylesheets="@styles.css" styleClass="dark-panel" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wirasat.AddAssetDialogController">
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>

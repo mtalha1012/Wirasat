@@ -119,54 +119,62 @@ public class MockDataService {
         shareRules.add(new ShareRule(s++, 4, 1, 3, "NO_CHILD"));
         shareRules.add(new ShareRule(s++, 6, 1, 2, "ONLY_ONE"));
         shareRules.add(new ShareRule(s++, 6, 2, 3, "MULTIPLE"));
+        // Granddaughter (relation 11) — same fractions as Daughter when no Son exists
+        shareRules.add(new ShareRule(s++, 11, 1, 2, "ONLY_ONE"));
+        shareRules.add(new ShareRule(s++, 11, 2, 3, "MULTIPLE"));
+        // Full Sister (relation 13)
+        shareRules.add(new ShareRule(s++, 13, 1, 2, "ONLY_ONE"));
+        shareRules.add(new ShareRule(s++, 13, 2, 3, "MULTIPLE"));
+        // Consanguine (Paternal) Sister (relation 15)
+        shareRules.add(new ShareRule(s++, 15, 1, 2, "ONLY_ONE"));
+        shareRules.add(new ShareRule(s++, 15, 2, 3, "MULTIPLE"));
+        // Uterine Brother (relation 16)
+        shareRules.add(new ShareRule(s++, 16, 1, 6, "ONLY_ONE"));
+        shareRules.add(new ShareRule(s++, 16, 1, 3, "MULTIPLE"));
+        // Uterine Sister (relation 17) — same as Uterine Brother
+        shareRules.add(new ShareRule(s++, 17, 1, 6, "ONLY_ONE"));
+        shareRules.add(new ShareRule(s++, 17, 1, 3, "MULTIPLE"));
 
-        // --- family_members (demo) ---
-        // Principal deceased — DOD = Jan 1 2025 (fixed, past date)
-        Calendar decDOD = Calendar.getInstance();
-        decDOD.set(2025, Calendar.JANUARY, 1);
-        Calendar decDOB = Calendar.getInstance();
-        decDOB.set(1960, Calendar.MARCH, 15);
+        // --- family_members (seed.sql) --- age is VIRTUAL, not stored
+        Calendar decDOD = Calendar.getInstance(); decDOD.set(2026, Calendar.JANUARY, 1);
+        Calendar decDOB = Calendar.getInstance(); decDOB.set(1960, Calendar.MAY, 15);
+        FamilyMember deceased = new FamilyMember(1, "35202-1111111-1", "Tariq Mahmood", decDOB.getTime(), 'M', decDOD.getTime(), null, null);
 
-        FamilyMember deceased = new FamilyMember(1, "12345-1234567-1", "Muhammad Aslam Khan",
-                decDOB.getTime(), 'M', 65, decDOD.getTime(), null, null);
+        Calendar wifeDOB = Calendar.getInstance(); wifeDOB.set(1965, Calendar.AUGUST, 20);
+        FamilyMember wife = new FamilyMember(2, "35202-2222222-2", "Ayesha Tariq", wifeDOB.getTime(), 'F', null, null, null);
 
-        Calendar sonDOB = Calendar.getInstance(); sonDOB.set(1990, Calendar.JUNE, 10);
-        FamilyMember son = new FamilyMember(2, "12345-1234567-2", "Ali Khan",
-                sonDOB.getTime(), 'M', 35, null, 1, null);
+        Calendar sonDOB = Calendar.getInstance(); sonDOB.set(1990, Calendar.OCTOBER, 10);
+        FamilyMember son = new FamilyMember(3, "35202-3333333-3", "Ali Tariq", sonDOB.getTime(), 'M', null, 1, 2);
 
-        Calendar dauDOB = Calendar.getInstance(); dauDOB.set(1993, Calendar.SEPTEMBER, 20);
-        FamilyMember daughter = new FamilyMember(3, "12345-1234567-3", "Aisha Khan",
-                dauDOB.getTime(), 'F', 32, null, 1, null);
-
-        Calendar wifeDOB = Calendar.getInstance(); wifeDOB.set(1965, Calendar.DECEMBER, 5);
-        FamilyMember wife = new FamilyMember(4, "12345-1234567-4", "Fatima Bibi",
-                wifeDOB.getTime(), 'F', 60, null, null, null);
+        Calendar dauDOB = Calendar.getInstance(); dauDOB.set(1995, Calendar.DECEMBER, 5);
+        FamilyMember daughter = new FamilyMember(4, "35202-4444444-4", "Fatima Tariq", dauDOB.getTime(), 'F', null, 1, 2);
 
         familyMembers.add(deceased);
+        familyMembers.add(wife);
         familyMembers.add(son);
         familyMembers.add(daughter);
-        familyMembers.add(wife);
         principalDeceasedId = 1;
 
         // --- deceased_heirs ---
-        deceasedHeirs.add(new DeceasedHeir(1, 1, 2, 5));  // Son (rel=5)
-        deceasedHeirs.add(new DeceasedHeir(2, 1, 3, 6));  // Daughter (rel=6)
-        deceasedHeirs.add(new DeceasedHeir(3, 1, 4, 2));  // Wife (rel=2)
+        deceasedHeirs.add(new DeceasedHeir(1, 1, 2, 2));  // Wife (rel=2)
+        deceasedHeirs.add(new DeceasedHeir(2, 1, 3, 5));  // Son (rel=5)
+        deceasedHeirs.add(new DeceasedHeir(3, 1, 4, 6));  // Daughter (rel=6)
 
         // --- assets (owned by deceased, type IDs match seed.sql) ---
-        Asset a1 = new Asset(1, "Main House — Gulberg, Lahore", 3, 1, false);
-        a1.setValue(new BigDecimal("25000000"));
-        Asset a2 = new Asset(2, "DHA Phase 5 Plot", 3, 1, false);
-        a2.setValue(new BigDecimal("19000000"));
-        Asset a3 = new Asset(3, "Allied Bank Savings Account", 1, 1, true);
-        a3.setValue(new BigDecimal("5200000"));
+        Asset a1 = new Asset(1, "DHA Phase 5 House", 3, 1, true);
+        a1.setValue(new BigDecimal("35000000.00"));
+        Asset a2 = new Asset(2, "Meezan Bank Savings Account", 1, 1, true);
+        a2.setValue(new BigDecimal("2500000.00"));
+        Asset a3 = new Asset(3, "Toyota Corolla 2022", 6, 1, true);
+        a3.setValue(new BigDecimal("5500000.00"));
         assets.add(a1); assets.add(a2); assets.add(a3);
 
         // --- liabilities ---
-        liabilities.add(new Liability(1, "Bank Loan — HBL", new BigDecimal("1000000"), 1));
+        liabilities.add(new Liability(1, "Pending Hospital Bills", new BigDecimal("150000.00"), 1));
+        liabilities.add(new Liability(2, "Personal Loan from Brother", new BigDecimal("500000.00"), 1));
 
         // --- wasiyat ---
-        wasiyats.add(new Wasiyat(1, 1, 0, new BigDecimal("500000")));
+        wasiyats.add(new Wasiyat(1, 1, 1, new BigDecimal("1000000.00")));
     }
 
     // === PRINCIPAL DECEASED ===
@@ -222,6 +230,9 @@ public class MockDataService {
         if (exists) return; // UNIQUE constraint
         dh.setMappingId(nextMappingId++);
         deceasedHeirs.add(dh);
+    }
+    public void removeDeceasedHeir(DeceasedHeir dh) {
+        deceasedHeirs.remove(dh);
     }
 
     // === LOOKUPS ===

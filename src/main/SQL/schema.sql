@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS assets(
     type_id INT,
     owner_id INT,
     is_shareable BOOLEAN DEFAULT TRUE,
+    value DECIMAL(15, 2),
     
     CONSTRAINT assets_pk
 		PRIMARY KEY(asset_id),

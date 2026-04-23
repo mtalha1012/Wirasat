@@ -39,7 +39,7 @@
                 <HBox spacing="8">
                     <Button text="+ Son" onAction="#handleAddSon" style="-fx-background-color: rgba(59,130,246,0.2); -fx-text-fill: #60a5fa; -fx-font-size: 12px; -fx-cursor: hand;"/>
                     <Button text="+ Daughter" onAction="#handleAddDaughter" style="-fx-background-color: rgba(244,114,182,0.2); -fx-text-fill: #f472b6; -fx-font-size: 12px; -fx-cursor: hand;"/>
-                    <Button text="+ Wife" onAction="#handleAddWife" style="-fx-background-color: rgba(226,185,59,0.2); -fx-text-fill: #E2B93B; -fx-font-size: 12px; -fx-cursor: hand;"/>
+                    <Button fx:id="addSpouseBtn" text="+ Spouse" style="-fx-background-color: rgba(226,185,59,0.2); -fx-text-fill: #E2B93B; -fx-font-size: 12px; -fx-cursor: hand;"/>
                 </HBox>
                 <HBox spacing="8">
                     <Button text="+ Brother" onAction="#handleAddBrother" style="-fx-background-color: rgba(52,211,153,0.2); -fx-text-fill: #34d399; -fx-font-size: 12px; -fx-cursor: hand;"/>
@@ -51,6 +51,8 @@
                 </HBox>
                 
                 <Separator style="-fx-background-color: #374151;"/>
+                <Button fx:id="editMemberBtn" text="Edit Member Details..." maxWidth="Infinity" style="-fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" onAction="#handleEditMember"/>
+                <Button fx:id="setPrincipalBtn" text="Set as Principal Deceased" maxWidth="Infinity" style="-fx-background-color: rgba(226,185,59,0.2); -fx-text-fill: #E2B93B; -fx-font-weight: bold; -fx-cursor: hand;" onAction="#handleSetPrincipal"/>
                 <Button fx:id="toggleDeathBtn" text="Mark as Deceased" maxWidth="Infinity" style="-fx-background-color: rgba(239,68,68,0.2); -fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-cursor: hand;" onAction="#handleToggleDeath"/>
                 <Button text="Remove from Tree" maxWidth="Infinity" style="-fx-background-color: rgba(239,68,68,0.1); -fx-text-fill: #fca5a5; -fx-cursor: hand;" onAction="#handleRemoveNode"/>
             </VBox>

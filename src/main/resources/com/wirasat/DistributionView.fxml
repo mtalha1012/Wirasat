@@ -13,8 +13,7 @@
             <Label text="Sharia Asset Allocator" styleClass="page-title"/>
             <Label text="Dynamically assign properties to heirs to fulfill their Faraid quotas" styleClass="page-subtitle"/>
         </VBox>
-        <Button text="1. Calculate Shares" styleClass="action-button" onAction="#handleRunCalculation"/>
-        <Button text="2. Auto-Assign" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;" onAction="#handleAutoAssign"/>
+        <Button text="Auto-Assign" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;" onAction="#handleAutoAssign"/>
     </HBox>
     
     <Label fx:id="resultSummary" style="-fx-font-size: 14px; -fx-text-fill: #9ca3af;" wrapText="true"/>

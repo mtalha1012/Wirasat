@@ -126,10 +126,10 @@ INSERT INTO deceased_heirs (mapping_id, deceased_id, heir_id, relation_id) VALUE
 (2, 1, 3, 5),
 (3, 1, 4, 6);
 
-INSERT INTO assets (asset_id, asset_name, type_id, owner_id, is_shareable) VALUES
-(1, 'DHA Phase 5 House', 3, 1, TRUE),
-(2, 'Meezan Bank Savings Account', 1, 1, TRUE),
-(3, 'Toyota Corolla 2022', 6, 1, TRUE);
+INSERT INTO assets (asset_id, asset_name, type_id, owner_id, is_shareable, value) VALUES
+(1, 'DHA Phase 5 House', 3, 1, TRUE, 35000000.00),
+(2, 'Meezan Bank Savings Account', 1, 1, TRUE, 2500000.00),
+(3, 'Toyota Corolla 2022', 6, 1, TRUE, 5500000.00);
 
 INSERT INTO valuation_history (valuation_history_id, asset_id, valuation_date, amount) VALUES
 (1, 1, '2026-01-05', 35000000.00),

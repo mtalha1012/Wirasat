@@ -291,6 +291,11 @@ public class FaraidCalculationService {
                 .filter(h -> h.fractionAssigned > 0 && (h.relation.getCategory() == null || !h.relation.getCategory().equalsIgnoreCase("Spouse")))
                 .collect(Collectors.toList());
 
+        // If no non-spouse heirs exist, modern consensus (including Pakistan) returns Radd to the Spouse
+        if (raddEligible.isEmpty()) {
+            raddEligible = heirs.stream().filter(h -> h.fractionAssigned > 0).collect(Collectors.toList());
+        }
+
         if (raddEligible.isEmpty()) return;
 
         double nonSpouseTotal = raddEligible.stream().mapToDouble(h -> h.fractionAssigned).sum();

@@ -16,9 +16,9 @@
             </VBox>
             <Region prefHeight="30" /> 
             
-            <Button text="Dashboard" styleClass="nav-button" onAction="#showDashboard"/>
+            <Button text="Dashboard" styleClass="nav-button, active-nav" onAction="#showDashboard"/>
             <Button text="Family Members" styleClass="nav-button" onAction="#showFamilyMembers"/>
-            <Button text="Assets" styleClass="nav-button, active-nav" onAction="#showAssets"/>
+            <Button text="Assets" styleClass="nav-button" onAction="#showAssets"/>
             <Button text="Liabilities" styleClass="nav-button" onAction="#showLiabilities"/>
             <Button text="Wasiyat (Will)" styleClass="nav-button" onAction="#showWasiyat"/>
             <Button text="Distribution" styleClass="nav-button" onAction="#showDistribution"/>

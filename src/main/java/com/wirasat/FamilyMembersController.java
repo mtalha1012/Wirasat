@@ -35,10 +35,39 @@ public class FamilyMembersController implements Initializable {
     @FXML private Label statusLabel;
     @FXML private Label relationLabel;
     @FXML private Button toggleDeathBtn;
+    @FXML private Button setPrincipalBtn;
+    @FXML private Button addSpouseBtn;
+    @FXML private Button editMemberBtn;
 
     private MockDataService db;
     private FamilyMember selectedMember;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+
+    @FXML
+    private void handleSetPrincipal(ActionEvent event) {
+        if (selectedMember == null) return;
+        if (selectedMember.getDateOfDeath() == null) {
+            new Alert(Alert.AlertType.WARNING, "This person is marked as Alive. Mark them as Deceased first before making them the Principal Deceased.").showAndWait();
+            return;
+        }
+        db.setPrincipalDeceasedId(selectedMember.getMemberId());
+        
+        // Notify user about context shift
+        Alert info = new Alert(Alert.AlertType.INFORMATION, "Principal Deceased is now " + selectedMember.getName() + ".\nThe inheritance dashboard and tools will now calculate distributions based on their estate.");
+        info.setHeaderText("Distribution Context Changed");
+        info.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        info.getDialogPane().getStyleClass().add("dark-panel");
+        info.showAndWait();
+        
+        updateActionPanel();
+        refreshTree();
+    }
+
+    @FXML
+    private void handleEditMember(ActionEvent event) {
+        if (selectedMember == null) return;
+        editMemberDialog(selectedMember);
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -158,6 +187,17 @@ public class FamilyMembersController implements Initializable {
         boolean isPrincipal = deceased != null && m.getMemberId() == deceased.getMemberId();
         boolean isDead = m.getDateOfDeath() != null;
 
+        // Smart UI logic for Spouse
+        if (deceased != null) {
+            if (deceased.getGender() == 'F') {
+                addSpouseBtn.setText("+ Husband");
+                addSpouseBtn.setOnAction(e -> quickAdd("Husband", 'M', 1));
+            } else {
+                addSpouseBtn.setText("+ Wife");
+                addSpouseBtn.setOnAction(e -> quickAdd("Wife", 'F', 2));
+            }
+        }
+
         selectedNodeLabel.setText(m.getName());
         
         String statusText = "Status: ";
@@ -185,6 +225,14 @@ public class FamilyMembersController implements Initializable {
             relationLabel.setText("This person's estate is being distributed.\nDOB: " + dateFormat.format(m.getDateOfBirth()));
         } else {
             relationLabel.setText("");
+        }
+
+        if (isPrincipal) {
+            setPrincipalBtn.setVisible(false);
+            setPrincipalBtn.setManaged(false);
+        } else {
+            setPrincipalBtn.setVisible(true);
+            setPrincipalBtn.setManaged(true);
         }
 
         if (isDead) {
@@ -253,11 +301,130 @@ public class FamilyMembersController implements Initializable {
     }
 
     // ===========================================================================
-    // QUICK-ADD — collects name, gender, DOB, relation (schema-complete)
+    // QUICK-ADD & ROBUST EDIT — honors schema fields
     // ===========================================================================
+    private void editMemberDialog(FamilyMember m) {
+        FamilyMember deceased = db.getDeceased();
+
+        Dialog<Boolean> dialog = new Dialog<>();
+        dialog.setTitle("Edit Member Details");
+        dialog.setHeaderText("Modifying " + m.getName());
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dark-panel");
+        ButtonType saveBtn = new ButtonType("Save Changes", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane(); grid.setHgap(10); grid.setVgap(10);
+
+        TextField nameField = new TextField(m.getName());
+        TextField cnicField = new TextField(m.getCnic() != null ? m.getCnic() : "");
+        cnicField.setPromptText("e.g. 35202-1234567-1");
+        ComboBox<String> genderBox = new ComboBox<>();
+        genderBox.getItems().addAll("Male", "Female");
+        genderBox.setValue(m.getGender() == 'M' ? "Male" : "Female");
+
+        DatePicker dobPicker = new DatePicker(m.getDateOfBirth() != null ? m.getDateOfBirth().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : LocalDate.of(1990, 1, 1));
+
+        // Setup relation combo box
+        ComboBox<RelationType> relationBox = new ComboBox<>();
+        relationBox.getItems().add(null); // Allow explicitly removing mapping
+        relationBox.getItems().addAll(db.getRelationTypes());
+        relationBox.setConverter(new javafx.util.StringConverter<RelationType>() {
+            @Override public String toString(RelationType r) {
+                return r != null ? r.getRelationId() + ". " + r.getRelationName() + " (" + r.getCategory() + ")" : "Not related (Remove Mapping)";
+            }
+            @Override public RelationType fromString(String s) { return null; }
+        });
+        
+        // Find existing mapping
+        DeceasedHeir mapping = null;
+        if (deceased != null) {
+            mapping = db.getDeceasedHeirMappings().stream()
+                .filter(dh -> dh.getHeirId() == m.getMemberId()).findFirst().orElse(null);
+            if (mapping != null) {
+                relationBox.setValue(db.getRelationTypeById(mapping.getRelationId()));
+            } else {
+                relationBox.setValue(null);
+            }
+        }
+
+        // Setup explicit father and mother combos mapped purely to family_members table
+        ComboBox<FamilyMember> fatherBox = new ComboBox<>();
+        ComboBox<FamilyMember> motherBox = new ComboBox<>();
+        fatherBox.getItems().add(null);
+        motherBox.getItems().add(null);
+        for (FamilyMember potentialParent : db.getFamilyMembers()) {
+            if (potentialParent.getMemberId() == m.getMemberId()) continue; // Cannot be own parent
+            if (potentialParent.getGender() == 'M') fatherBox.getItems().add(potentialParent);
+            else motherBox.getItems().add(potentialParent);
+        }
+        
+        javafx.util.StringConverter<FamilyMember> parentConverter = new javafx.util.StringConverter<FamilyMember>() {
+            @Override public String toString(FamilyMember fm) { return fm != null ? fm.getName() : "None/Unknown"; }
+            @Override public FamilyMember fromString(String s) { return null; }
+        };
+        fatherBox.setConverter(parentConverter);
+        motherBox.setConverter(parentConverter);
+        
+        fatherBox.setValue(m.getFatherId() != null ? db.getMemberById(m.getFatherId()) : null);
+        motherBox.setValue(m.getMotherId() != null ? db.getMemberById(m.getMotherId()) : null);
+
+        grid.add(new Label("Name:"), 0, 0);             grid.add(nameField, 1, 0);
+        grid.add(new Label("CNIC:"), 0, 1);              grid.add(cnicField, 1, 1);
+        grid.add(new Label("Gender:"), 0, 2);             grid.add(genderBox, 1, 2);
+        grid.add(new Label("Date of Birth:"), 0, 3);      grid.add(dobPicker, 1, 3);
+        
+        boolean isPrincipal = deceased != null && m.getMemberId() == deceased.getMemberId();
+        if (!isPrincipal) {
+            grid.add(new Label("Relation to Principal:"), 0, 4); grid.add(relationBox, 1, 4);
+            grid.add(new Label("Father:"), 0, 5); grid.add(fatherBox, 1, 5);
+            grid.add(new Label("Mother:"), 0, 6); grid.add(motherBox, 1, 6);
+        }
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().setPrefWidth(500);
+
+        final DeceasedHeir existingMap = mapping;
+        dialog.setResultConverter(btn -> {
+            if (btn == saveBtn) {
+                m.setName(nameField.getText().trim());
+                String cnic = cnicField.getText().trim();
+                m.setCnic(cnic.isEmpty() ? null : cnic);
+                m.setGender(genderBox.getValue().equals("Male") ? 'M' : 'F');
+                if (dobPicker.getValue() != null) {
+                    m.setDateOfBirth(Date.from(dobPicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                }
+                
+                if (!isPrincipal) {
+                    if (fatherBox.getValue() != null) m.setFatherId(fatherBox.getValue().getMemberId());
+                    else m.setFatherId(null);
+                    
+                    if (motherBox.getValue() != null) m.setMotherId(motherBox.getValue().getMemberId());
+                    else m.setMotherId(null);
+
+                    RelationType rel = relationBox.getValue();
+                    if (rel != null) {
+                        if (existingMap != null) existingMap.setRelationId(rel.getRelationId());
+                        else db.addDeceasedHeir(new DeceasedHeir(0, deceased.getMemberId(), m.getMemberId(), rel.getRelationId()));
+                    } else if (existingMap != null) {
+                        db.removeDeceasedHeir(existingMap);
+                    }
+                }
+                return true;
+            }
+            return false;
+        });
+
+        dialog.showAndWait().ifPresent(changed -> {
+            if (changed) {
+                updateActionPanel();
+                refreshTree();
+            }
+        });
+    }
+
     @FXML private void handleAddSon(ActionEvent e)      { quickAdd("Son", 'M', 5); }
     @FXML private void handleAddDaughter(ActionEvent e)  { quickAdd("Daughter", 'F', 6); }
-    @FXML private void handleAddWife(ActionEvent e)      { quickAdd("Wife", 'F', 2); }
     @FXML private void handleAddBrother(ActionEvent e)   { quickAdd("Full Brother", 'M', 12); }
     @FXML private void handleAddSister(ActionEvent e)    { quickAdd("Full Sister", 'F', 13); }
     @FXML private void handleAddFather(ActionEvent e)    { quickAdd("Father", 'M', 3); }
@@ -281,6 +448,7 @@ public class FamilyMembersController implements Initializable {
         GridPane grid = new GridPane(); grid.setHgap(10); grid.setVgap(10);
 
         TextField nameField = new TextField(); nameField.setPromptText("Full Name");
+        TextField cnicField = new TextField(); cnicField.setPromptText("e.g. 35202-1234567-1");
         ComboBox<String> genderBox = new ComboBox<>();
         genderBox.getItems().addAll("Male", "Female");
         genderBox.setValue(gender == 'M' ? "Male" : "Female");
@@ -299,9 +467,10 @@ public class FamilyMembersController implements Initializable {
         if (defaultRel != null) relationBox.setValue(defaultRel);
 
         grid.add(new Label("Name:"), 0, 0);             grid.add(nameField, 1, 0);
-        grid.add(new Label("Gender:"), 0, 1);            grid.add(genderBox, 1, 1);
-        grid.add(new Label("Date of Birth:"), 0, 2);     grid.add(dobPicker, 1, 2);
-        grid.add(new Label("Relation to Deceased:"), 0, 3); grid.add(relationBox, 1, 3);
+        grid.add(new Label("CNIC:"), 0, 1);              grid.add(cnicField, 1, 1);
+        grid.add(new Label("Gender:"), 0, 2);             grid.add(genderBox, 1, 2);
+        grid.add(new Label("Date of Birth:"), 0, 3);      grid.add(dobPicker, 1, 3);
+        grid.add(new Label("Relation to Deceased:"), 0, 4); grid.add(relationBox, 1, 4);
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().setPrefWidth(500);
 
@@ -317,7 +486,7 @@ public class FamilyMembersController implements Initializable {
                     if (deceased.getGender() == 'M') fatherId = deceased.getMemberId();
                     else motherId = deceased.getMemberId();
                 }
-                return new FamilyMember(0, "", nameField.getText().trim(), dob, g, 0, null, fatherId, motherId);
+                return new FamilyMember(0, cnicField.getText().trim().isEmpty() ? null : cnicField.getText().trim(), nameField.getText().trim(), dob, g, null, fatherId, motherId);
             }
             return null;
         });

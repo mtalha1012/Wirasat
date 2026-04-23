@@ -101,6 +101,8 @@ public class AssetsController implements Initializable {
     private void showEditDialog(Asset asset) {
         Dialog<Asset> dialog = new Dialog<>();
         dialog.setTitle("Edit Asset");
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+        dialog.getDialogPane().getStyleClass().add("dark-panel");
         ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
@@ -177,7 +179,9 @@ public class AssetsController implements Initializable {
             stage.setTitle("Add New Asset");
             stage.initModality(javafx.stage.Modality.WINDOW_MODAL);
             stage.initOwner(((javafx.scene.Node) event.getSource()).getScene().getWindow());
-            stage.setScene(new javafx.scene.Scene(root));
+            javafx.scene.Scene scene = new javafx.scene.Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/com/wirasat/styles.css").toExternalForm());
+            stage.setScene(scene);
             stage.showAndWait();
             Asset newAsset = dialogController.getCreatedAsset();
             if (newAsset != null) {

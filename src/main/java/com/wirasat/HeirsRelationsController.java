@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 
 /**
  * Shows all heir-to-deceased mappings for the principal deceased.
- * Allows adding new mappings.
+ * Allows adding new mappings and deleting existing ones.
  */
 public class HeirsRelationsController implements Initializable {
 
@@ -25,6 +25,7 @@ public class HeirsRelationsController implements Initializable {
     @FXML private TableColumn<DeceasedHeir, String> colHeir;
     @FXML private TableColumn<DeceasedHeir, String> colRelation;
     @FXML private TableColumn<DeceasedHeir, String> colCategory;
+    @FXML private TableColumn<DeceasedHeir, Void> colActions;
 
     private MockDataService db;
 
@@ -47,6 +48,24 @@ public class HeirsRelationsController implements Initializable {
         colCategory.setCellValueFactory(data -> {
             RelationType r = db.getRelationTypeById(data.getValue().getRelationId());
             return new ReadOnlyObjectWrapper<>(r != null ? r.getCategory() : "N/A");
+        });
+
+        // Delete button column
+        colActions.setCellFactory(col -> new TableCell<>() {
+            private final Button deleteBtn = new Button("Remove");
+            {
+                deleteBtn.setStyle("-fx-background-color: rgba(239,68,68,0.15); -fx-text-fill: #ef4444; -fx-font-size: 11px; -fx-cursor: hand;");
+                deleteBtn.setOnAction(e -> {
+                    DeceasedHeir dh = getTableView().getItems().get(getIndex());
+                    db.removeDeceasedHeir(dh);
+                    refreshTable();
+                });
+            }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : deleteBtn);
+            }
         });
 
         refreshTable();
@@ -116,3 +135,4 @@ public class HeirsRelationsController implements Initializable {
         });
     }
 }
+
