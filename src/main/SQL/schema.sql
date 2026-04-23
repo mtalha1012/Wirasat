@@ -15,7 +15,12 @@ CREATE TABLE IF NOT EXISTS family_members(
     name VARCHAR(100) NOT NULL,
     date_of_birth DATETIME NOT NULL,
     gender CHAR(1) NOT NULL,
-    age INT,
+    age INT AS (
+		TIMESTAMPDIFF(
+			YEAR, date_of_birth, 
+			IFNULL(date_of_death, CURDATE())
+			)
+		) VIRTUAL,
     date_of_death DATETIME,
     father_id INT NULL,
     mother_id INT NULL,
