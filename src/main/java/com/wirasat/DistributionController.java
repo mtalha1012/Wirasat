@@ -56,6 +56,7 @@ public class DistributionController implements Initializable {
         if (deceased == null) {
             resultSummary.setText("⚠ No principal deceased set.");
             resultSummary.setStyle("-fx-font-size: 14px; -fx-text-fill: #ef4444; -fx-font-weight: bold;");
+            resultSummary.setMaxWidth(Double.MAX_VALUE);
             return;
         }
 
@@ -126,7 +127,9 @@ public class DistributionController implements Initializable {
             }
 
             resultSummary.setText(sb.toString());
-            resultSummary.setStyle("-fx-font-size: 13px; -fx-text-fill: #22c55e; -fx-font-weight: bold;");
+            resultSummary.setStyle("-fx-font-size: 13px; -fx-text-fill: #22c55e; -fx-font-weight: bold; -fx-text-overrun: clip;");
+            resultSummary.setPrefWidth(1200); // Larger baseline to avoid truncation
+            resultSummary.setMaxWidth(Double.MAX_VALUE);
             resultSummary.setWrapText(true);
 
             // Populate heir data maps

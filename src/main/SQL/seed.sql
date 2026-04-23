@@ -105,7 +105,22 @@ INSERT INTO share_rules (relation_id, numerator, denominator, condition_type) VA
 (4, 1, 3, 1),
 -- Daughter
 (6, 1, 2, 4),
-(6, 2, 3, 5);
+(6, 2, 3, 5),
+-- Granddaughter (same as daughter if no daughter/son)
+(11, 1, 2, 4),
+(11, 2, 3, 5),
+-- Full Sister
+(13, 1, 2, 4),
+(13, 2, 3, 5),
+-- Consanguine Sister
+(15, 1, 2, 4),
+(15, 2, 3, 5),
+-- Uterine Brother
+(16, 1, 6, 4),
+(16, 1, 3, 5),
+-- Uterine Sister
+(17, 1, 6, 4),
+(17, 1, 3, 5);
 
 INSERT INTO beneficiary_types (type_id, type_name) VALUES
 (1, 'Individual'),

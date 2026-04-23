@@ -107,7 +107,9 @@
 }
 .arabic-text {
     -fx-text-fill: #E2B93B;
-    -fx-font-size: 18px;
+    -fx-font-size: 11px;
+    -fx-wrap-text: true;
+    -fx-text-alignment: CENTER;
 }
 .quote-text {
     -fx-text-fill: #6b7280;
@@ -270,4 +272,44 @@
 }
 .scroll-bar .increment-arrow, .scroll-bar .decrement-arrow {
     -fx-background-color: #9ca3af;
+}
+
+/* DatePicker Popup Dark Theme */
+.date-picker-popup {
+    -fx-background-color: #1c2331;
+    -fx-border-color: #374151;
+}
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: #151c28;
+}
+.date-picker-popup > .month-year-pane > .label {
+    -fx-text-fill: white;
+}
+.date-picker-popup > .calendar-grid {
+    -fx-background-color: #1c2331;
+}
+.date-picker-popup > .calendar-grid > .day-cell {
+    -fx-background-color: #1c2331;
+    -fx-text-fill: #d1d5db;
+}
+.date-picker-popup > .calendar-grid > .day-cell:hover {
+    -fx-background-color: #374151;
+}
+.date-picker-popup > .calendar-grid > .today {
+    -fx-background-color: rgba(226, 185, 59, 0.2);
+    -fx-text-fill: #E2B93B;
+}
+
+/* ComboBox Popup List Theme */
+.combo-box-popup .list-view {
+    -fx-background-color: #1c2331;
+    -fx-border-color: #374151;
+}
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #1c2331;
+    -fx-text-fill: #d1d5db;
+}
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #E2B93B;
 }
