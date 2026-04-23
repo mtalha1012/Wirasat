@@ -1,6 +1,5 @@
 USE wirasat;
 
-
 INSERT INTO asset_types (type_id, category_name) VALUES
 (1, 'Cash at Bank'),
 (2, 'Cash in Hand'),
@@ -11,34 +10,43 @@ INSERT INTO asset_types (type_id, category_name) VALUES
 (7, 'Investments (Stocks/Bonds)'),
 (8, 'Other Assets');
 
-INSERT INTO relation_types (relation_id, relation_name, category) VALUES
+INSERT INTO relation_categories (category_id, category_name) VALUES
+(1, 'Spouse'),
+(2, 'Primary Ascendant'),
+(3, 'Primary Descendant'),
+(4, 'Secondary Ascendant'),
+(5, 'Secondary Descendant'),
+(6, 'Sibling'),
+(7, 'Extended');
+
+INSERT INTO relation_types (relation_id, relation_name, category_id) VALUES
 -- Primary Heirs (they can never be blocked!)
-(1, 'Husband', 'Spouse'),
-(2, 'Wife', 'Spouse'),
-(3, 'Father', 'Primary Ascendant'),
-(4, 'Mother', 'Primary Ascendant'),
-(5, 'Son', 'Primary Descendant'),
-(6, 'Daughter', 'Primary Descendant'),
+(1, 'Husband', 1),
+(2, 'Wife', 1),
+(3, 'Father', 2),
+(4, 'Mother', 2),
+(5, 'Son', 3),
+(6, 'Daughter', 3),
 
 -- Secondary Ascendants & Descendants (can be blocked)
-(7, 'Paternal Grandfather', 'Secondary Ascendant'),
-(8, 'Paternal Grandmother', 'Secondary Ascendant'),
-(9, 'Maternal Grandmother', 'Secondary Ascendant'),
-(10, 'Son''s Son (Grandson)', 'Secondary Descendant'),
-(11, 'Son''s Daughter (Granddaughter)', 'Secondary Descendant'),
+(7, 'Paternal Grandfather', 4),
+(8, 'Paternal Grandmother', 4),
+(9, 'Maternal Grandmother', 4),
+(10, 'Son''s Son (Grandson)', 5),
+(11, 'Son''s Daughter (Granddaughter)', 5),
 
 -- Siblings
-(12, 'Full Brother', 'Sibling'),
-(13, 'Full Sister', 'Sibling'),
-(14, 'Consanguine (Paternal) Brother', 'Sibling'),
-(15, 'Consanguine (Paternal) Sister', 'Sibling'),
-(16, 'Uterine (Maternal) Brother', 'Sibling'),
-(17, 'Uterine (Maternal) Sister', 'Sibling'),
+(12, 'Full Brother', 6),
+(13, 'Full Sister', 6),
+(14, 'Consanguine (Paternal) Brother', 6),
+(15, 'Consanguine (Paternal) Sister', 6),
+(16, 'Uterine (Maternal) Brother', 6),
+(17, 'Uterine (Maternal) Sister', 6),
 
 -- Extended Residuaries
-(18, 'Full Brother''s Son (Nephew)', 'Extended'),
-(19, 'Paternal Uncle', 'Extended'),
-(20, 'Paternal Uncle''s Son (Cousin)', 'Extended');
+(18, 'Full Brother''s Son (Nephew)', 7),
+(19, 'Paternal Uncle', 7),
+(20, 'Paternal Uncle''s Son (Cousin)', 7);
 
 -- FARAID BLOCKING RULES (Al-Hajb)
 INSERT INTO faraid_blocking_rules (target_relation_id, blocking_relation_id) VALUES
@@ -83,24 +91,38 @@ INSERT INTO faraid_blocking_rules (target_relation_id, blocking_relation_id) VAL
 (19, 3),  -- Uncle blocked by Father
 (20, 19); -- Cousin blocked by Uncle
 
+INSERT INTO condition_types (condition_id, condition_name, description) VALUES
+(1, 'NO_CHILD', 'When the deceased has no children or grandchildren'),
+(2, 'WITH_CHILD', 'When the deceased has children or grandchildren'),
+(3, 'WITH_CHILD_OR_SIBLING', 'When the deceased has children or two or more siblings'),
+(4, 'ONLY_ONE', 'When there is only one person of this relation'),
+(5, 'MULTIPLE', 'When there are two or more persons of this relation');
+
 -- SHARE RULES (Faraid Fractional Shares)
 INSERT INTO share_rules (relation_id, numerator, denominator, condition_type) VALUES
 -- Husband
-(1, 1, 2, 'NO_CHILD'),        -- 1/2
-(1, 1, 4, 'WITH_CHILD'),      -- 1/4
+(1, 1, 2, 1),        -- 1/2 NO_CHILD
+(1, 1, 4, 2),        -- 1/4 WITH_CHILD
 
 -- Wife
-(2, 1, 4, 'NO_CHILD'),        -- 1/4
-(2, 1, 8, 'WITH_CHILD'),      -- 1/8
+(2, 1, 4, 1),        -- 1/4 NO_CHILD
+(2, 1, 8, 2),        -- 1/8 WITH_CHILD
 
 -- Father
-(3, 1, 6, 'WITH_CHILD'),      -- 1/6 if there are children. If no children, he is residuary.
+(3, 1, 6, 2),        -- 1/6 WITH_CHILD. If no children, he is residuary.
 
 -- Mother
-(4, 1, 6, 'WITH_CHILD_OR_SIBLING'), -- 1/6
-(4, 1, 3, 'NO_CHILD'),              -- 1/3
+(4, 1, 6, 3),        -- 1/6 WITH_CHILD_OR_SIBLING
+(4, 1, 3, 1),        -- 1/3 NO_CHILD
 
 -- Daughter (when there is NO son, otherwise Asabah)
-(6, 1, 2, 'ONLY_ONE'),        -- 1/2 if 1 daughter
-(6, 2, 3, 'MULTIPLE');        -- 2/3 if 2+ daughters
+(6, 1, 2, 4),        -- 1/2 ONLY_ONE
+(6, 2, 3, 5);        -- 2/3 MULTIPLE
 
+INSERT INTO beneficiary_types (type_id, type_name) VALUES
+(1, 'Individual'),
+(2, 'Charity/NGO'),
+(3, 'Mosque'),
+(4, 'Educational Institute'),
+(5, 'Hospital'),
+(6, 'Other');
