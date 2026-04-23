@@ -119,12 +119,14 @@ INSERT INTO family_members (member_id, cnic, name, date_of_birth, gender, date_o
 (1, '35202-1111111-1', 'Tariq Mahmood', '1960-05-15', 'M', '2026-01-01', NULL, NULL),
 (2, '35202-2222222-2', 'Ayesha Tariq', '1965-08-20', 'F', NULL, NULL, NULL),
 (3, '35202-3333333-3', 'Ali Tariq', '1990-10-10', 'M', NULL, 1, 2),
-(4, '35202-4444444-4', 'Fatima Tariq', '1995-12-05', 'F', NULL, 1, 2);
+(4, '35202-4444444-4', 'Fatima Tariq', '1995-12-05', 'F', NULL, 1, 2),
+(5, '35202-5555555-5', 'Usman Mahmood', '1962-07-12', 'M', NULL, NULL, NULL);
 
 INSERT INTO deceased_heirs (mapping_id, deceased_id, heir_id, relation_id) VALUES
 (1, 1, 2, 2),
 (2, 1, 3, 5),
-(3, 1, 4, 6);
+(3, 1, 4, 6),
+(4, 1, 5, 12);
 
 INSERT INTO assets (asset_id, asset_name, type_id, owner_id, is_shareable) VALUES
 (1, 'DHA Phase 5 House', 3, 1, TRUE),
